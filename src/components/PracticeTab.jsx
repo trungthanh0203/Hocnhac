@@ -1,24 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '../supabaseClient.js'
 import { notePos } from '../lib/staffSvg.js'
-import { playNote, playScore } from '../lib/audio.js'
+import { playScore } from '../lib/audio.js'
 
-// Bản nhạc gốc "Vui đến trường" — sáng tác riêng cho app (không dùng lại bài hát có sẵn
-// để tránh vấn đề bản quyền), chỉ dùng 5 nốt Đô-Rê-Mi-Fa-Sol đúng chương trình Sơ cấp 1.
-const SCORE_RAW = [
-  [{ note: 'C', dur: 1 }, { note: 'D', dur: 1 }],
-  [{ note: 'E', dur: 1 }, { note: 'F', dur: 1 }],
-  [{ note: 'G', dur: 2 }],
-  [{ note: 'G', dur: 1 }, { note: 'F', dur: 1 }],
-  [{ note: 'E', dur: 1 }, { note: 'D', dur: 1 }],
-  [{ note: 'C', dur: 2 }],
-  [{ note: 'E', dur: 1 }, { note: 'G', dur: 1 }],
-  [{ note: 'C', dur: 2 }],
-]
-const SOLFEGE = { C: 'Đô', D: 'Rê', E: 'Mi', F: 'Fa', G: 'Sol' }
+const SOLFEGE = { C: 'Đô', D: 'Rê', E: 'Mi', F: 'Fa', G: 'Sol', A: 'La', B: 'Si' }
 
-function buildScoreWithGid() {
+function buildFlatNotes(measuresRaw) {
   let gid = 0
-  return SCORE_RAW.map(measure => measure.map(n => ({ ...n, gid: gid++ })))
+  const measuresGid = measuresRaw.map(m => m.map(n => ({ ...n, gid: gid++ })))
+  return { measuresGid, flatNotes: measuresGid.flat() }
 }
 
 function renderScoreRow(measures, highlightGid) {
@@ -51,46 +41,57 @@ function renderScoreRow(measures, highlightGid) {
   return `<svg viewBox="0 0 ${totalW} 108" width="100%" style="display:block;margin-bottom:10px">${staffLines}${clef}${els}</svg>`
 }
 
-export default function PracticeTab() {
-  const scoreMeasures = useMemo(() => buildScoreWithGid(), [])
-  const flatNotes = useMemo(() => scoreMeasures.flat(), [scoreMeasures])
+export default function PracticeTab({ levelId }) {
+  const [scores, setScores] = useState([])
+  const [activeIdx, setActiveIdx] = useState(0)
   const [highlightGid, setHighlightGid] = useState(-1)
-  const [practiceIdx, setPracticeIdx] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    supabase.from('practice_scores').select('*').eq('level_id', levelId).order('order_index').then(({ data }) => {
+      setScores(data || [])
+      setActiveIdx(0)
+      setHighlightGid(-1)
+      setLoading(false)
+    })
+  }, [levelId])
+
+  const current = scores[activeIdx]
+  const { measuresGid, flatNotes } = useMemo(
+    () => current ? buildFlatNotes(current.measures) : { measuresGid: [], flatNotes: [] },
+    [current]
+  )
+
+  if (loading) return <div className="loading">Đang tải…</div>
+  if (scores.length === 0) return <div className="loading">Chưa có giai điệu thực hành cho cấp này.</div>
 
   const rows = []
-  for (let i = 0; i < scoreMeasures.length; i += 4) rows.push(scoreMeasures.slice(i, i + 4))
+  for (let i = 0; i < measuresGid.length; i += 4) rows.push(measuresGid.slice(i, i + 4))
   const scoreHtml = rows.map(r => renderScoreRow(r, highlightGid)).join('')
 
   function playFull() {
     playScore(flatNotes, gid => setHighlightGid(gid))
   }
 
-  const current = flatNotes[practiceIdx]
-
   return (
     <div className="panel">
-      <div className="lesson-eyebrow" style={{ marginBottom: 6 }}>Thực hành · Giai điệu "Vui đến trường" · sáng tác riêng cho Sơ cấp 1</div>
-      <div className="lesson-goal">🎯 Mục tiêu: đọc và hát đúng cao độ cả bài, ôn lại toàn bộ 5 nốt Đô-Rê-Mi-Fa-Sol đã học.</div>
+      <div className="lesson-eyebrow" style={{ marginBottom: 8 }}>Thực hành · chọn 1 trong {scores.length} giai điệu</div>
+      <div className="chip-row">
+        {scores.map((s, i) => (
+          <div key={s.id} className={'chip' + (activeIdx === i ? ' active' : '')} onClick={() => { setActiveIdx(i); setHighlightGid(-1) }}>
+            {s.title}
+          </div>
+        ))}
+      </div>
+      <div className="lesson-goal">🎯 Đọc và hát đúng cao độ cả bài "{current.title}".</div>
 
       <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: '14px 10px', marginBottom: 14 }}
         dangerouslySetInnerHTML={{ __html: scoreHtml }} />
 
-      <div style={{ textAlign: 'center', marginBottom: 16 }}>
+      <div style={{ textAlign: 'center' }}>
         <button className="play-btn" style={{ display: 'inline-flex' }} onClick={playFull}>▶</button>
         <div className="sub" style={{ marginTop: 6 }}>Nghe cả bài — nốt đang vang sẽ sáng lên trên bản nhạc</div>
-      </div>
-
-      <div className="lesson-box">
-        <div className="lesson-title" style={{ marginBottom: 12 }}>Đọc từng nốt</div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 30, fontWeight: 700, color: 'var(--navy)', marginBottom: 10 }}>{SOLFEGE[current.note]}</div>
-          <button className="play-btn" style={{ display: 'inline-flex' }} onClick={() => { playNote(current.note, current.dur * 0.7); setHighlightGid(current.gid) }}>▶</button>
-          <div className="lesson-nav" style={{ marginTop: 14 }}>
-            <button className="nav-btn" disabled={practiceIdx === 0} onClick={() => { const i = practiceIdx - 1; setPracticeIdx(i); setHighlightGid(flatNotes[i].gid) }}>← Nốt trước</button>
-            <span className="progress">{practiceIdx + 1}/{flatNotes.length}</span>
-            <button className="nav-btn" disabled={practiceIdx === flatNotes.length - 1} onClick={() => { const i = practiceIdx + 1; setPracticeIdx(i); setHighlightGid(flatNotes[i].gid) }}>Nốt sau →</button>
-          </div>
-        </div>
       </div>
     </div>
   )

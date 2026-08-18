@@ -57,7 +57,7 @@ export default function App() {
       {tab === 'review' && <ReviewTab levelId={activeLevelId} />}
       {tab === 'ear' && <EarTrainingTab levelId={activeLevelId} />}
       {tab === 'test' && <TestTab levelId={activeLevelId} />}
-      {tab === 'practice' && <PracticeTab />}
+      {tab === 'practice' && <PracticeTab levelId={activeLevelId} />}
 
       <Footer />
     </div>

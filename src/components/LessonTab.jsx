@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
-import { renderMediaFull } from '../lib/staffSvg.js'
+import { renderMediaFullV3 as renderMediaFull } from '../lib/staffSvg.js'
 import { playAudioAction } from '../lib/audio.js'
 
 // Tab "Bài học" — lấy dữ liệu THẬT từ Supabase (bảng lessons + lesson_points)

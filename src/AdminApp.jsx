@@ -5,12 +5,14 @@ import LessonsAdmin from './admin/LessonsAdmin.jsx'
 import QuestionsAdmin from './admin/QuestionsAdmin.jsx'
 import CodesAdmin from './admin/CodesAdmin.jsx'
 import StudentsAdmin from './admin/StudentsAdmin.jsx'
+import PracticeAdmin from './admin/PracticeAdmin.jsx'
 
 const TABS = [
   { key: 'lessons', label: 'Bài học', Comp: LessonsAdmin },
   { key: 'questions', label: 'Câu hỏi', Comp: QuestionsAdmin },
   { key: 'codes', label: 'Mã kích hoạt', Comp: CodesAdmin },
   { key: 'students', label: 'Học viên', Comp: StudentsAdmin },
+  { key: 'practice', label: 'Giai điệu', Comp: PracticeAdmin },
 ]
 
 export default function AdminApp() {

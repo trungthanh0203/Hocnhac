@@ -146,3 +146,184 @@ export function renderMediaFull(media) {
     default: return _origRenderMedia(media)
   }
 }
+
+// ============================================================
+// Bổ sung cho Sơ cấp 2-3: icon số chỉ nhịp (tổng quát cho mọi loại nhịp)
+// và icon dấu lặng
+// ============================================================
+export function renderMeterIcon(num, den, size = 70) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" style="display:block;margin:0 auto">
+    <line x1="10" y1="32" x2="54" y2="32" stroke="#0f2a52" stroke-width="1.6"/>
+    <text x="32" y="26" font-size="22" fill="#0f2a52" font-weight="bold" text-anchor="middle">${num}</text>
+    <text x="32" y="54" font-size="22" fill="#e8b64a" font-weight="bold" text-anchor="middle">${den}</text>
+  </svg>`
+}
+
+export function renderRestIcon(type, label, size = 80) {
+  if (type === 'half') {
+    return `<svg viewBox="0 0 80 50" width="${size}" style="display:block;margin:0 auto">
+      <rect x="30" y="16" width="20" height="7" fill="#0f2a52"/>
+      <text x="40" y="42" font-size="11" fill="#5c6270" text-anchor="middle">${label}</text>
+    </svg>`
+  }
+  return `<svg viewBox="0 0 80 60" width="${size}" style="display:block;margin:0 auto">
+    <text x="26" y="38" font-size="30" fill="#0f2a52">&#119133;</text>
+    <text x="40" y="54" font-size="11" fill="#5c6270" text-anchor="middle">${label}</text>
+  </svg>`
+}
+
+const _prevRenderMediaFull = renderMediaFull
+export function renderMediaFullV2(media) {
+  if (!media) return ''
+  if (media.kind === 'meter') return renderMeterIcon(media.num, media.den)
+  if (media.kind === 'rest') return renderRestIcon(media.type, media.label)
+  return _prevRenderMediaFull(media)
+}
+
+// ============================================================
+// BO SUNG LON: hình minh họa cho quãng, hợp âm, hóa biểu (dùng cho Trung cấp trở lên)
+// và vài hình còn thiếu ở Sơ cấp 2-3 (dấu lặng, so sánh trường độ...)
+// ============================================================
+
+export function renderBreathIcon(size = 50) {
+  return `<svg viewBox="0 0 50 50" width="${size}" style="display:block;margin:0 auto">
+    <path d="M18 10 Q10 25 18 40" fill="none" stroke="#0f2a52" stroke-width="2"/>
+    <path d="M30 10 Q22 25 30 40" fill="none" stroke="#e8b64a" stroke-width="2"/>
+  </svg>`
+}
+
+export function renderRestCompare(size = 170) {
+  return `<svg viewBox="0 0 170 70" width="${size}" style="display:block;margin:0 auto">
+    <text x="30" y="42" font-size="26" fill="#0f2a52" text-anchor="middle">&#119133;</text>
+    <text x="30" y="60" font-size="10" fill="#5c6270" text-anchor="middle">Lặng đen = 1 phách</text>
+    <rect x="115" y="24" width="20" height="7" fill="#e8b64a"/>
+    <text x="125" y="60" font-size="10" fill="#5c6270" text-anchor="middle">Lặng trắng = 2 phách</text>
+  </svg>`
+}
+
+export function renderBeamedEighths(size = 120) {
+  return `<svg viewBox="0 0 110 60" width="${size}" style="display:block;margin:0 auto">
+    <ellipse cx="20" cy="45" rx="7" ry="5.5" fill="#0f2a52"/>
+    <ellipse cx="55" cy="45" rx="7" ry="5.5" fill="#0f2a52"/>
+    <line x1="27" y1="45" x2="27" y2="14" stroke="#0f2a52" stroke-width="1.6"/>
+    <line x1="62" y1="45" x2="62" y2="14" stroke="#0f2a52" stroke-width="1.6"/>
+    <line x1="27" y1="14" x2="62" y2="14" stroke="#0f2a52" stroke-width="3"/>
+    <text x="41" y="58" font-size="10" fill="#5c6270" text-anchor="middle">2 móc đơn = 1 phách</text>
+  </svg>`
+}
+
+export function renderMilestoneIcon(size = 50) {
+  return `<svg viewBox="0 0 50 50" width="${size}" style="display:block;margin:0 auto">
+    <circle cx="25" cy="25" r="20" fill="none" stroke="#e8b64a" stroke-width="2.5"/>
+    <path d="M15 26 L22 33 L36 17" fill="none" stroke="#0f2a52" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`
+}
+
+export function renderDottedCompare(size = 180) {
+  return `<svg viewBox="0 0 170 70" width="${size}" style="display:block;margin:0 auto">
+    <ellipse cx="25" cy="45" rx="8" ry="6" fill="none" stroke="#0f2a52" stroke-width="1.8"/>
+    <line x1="33" y1="45" x2="33" y2="12" stroke="#0f2a52" stroke-width="1.6"/>
+    <text x="25" y="62" font-size="10" fill="#5c6270" text-anchor="middle">2 phách</text>
+    <ellipse cx="110" cy="45" rx="8" ry="6" fill="none" stroke="#e8b64a" stroke-width="1.8"/>
+    <line x1="118" y1="45" x2="118" y2="12" stroke="#e8b64a" stroke-width="1.6"/>
+    <circle cx="128" cy="45" r="2.4" fill="#e8b64a"/>
+    <text x="118" y="62" font-size="10" fill="#5c6270" text-anchor="middle">3 phách (chấm dôi)</text>
+  </svg>`
+}
+
+export function renderForwardIcon(size = 50) {
+  return `<svg viewBox="0 0 50 30" width="${size}" style="display:block;margin:0 auto">
+    <line x1="6" y1="15" x2="34" y2="15" stroke="#0f2a52" stroke-width="2.4"/>
+    <polyline points="27,7 38,15 27,23" fill="none" stroke="#e8b64a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`
+}
+
+// Quãng: vẽ 2 nốt trên khuông kèm dấu ngoặc và nhãn tên quãng
+export function renderIntervalSVG(noteA, noteB, label, size = 180) {
+  const yA = notePos[noteA], yB = notePos[noteB]
+  const ledgerA = noteA === 'C' ? `<line x1="81" y1="86" x2="99" y2="86" stroke="#1c2333" stroke-width="1"/>` : ''
+  const ledgerB = noteB === 'C' ? `<line x1="141" y1="86" x2="159" y2="86" stroke="#1c2333" stroke-width="1"/>` : ''
+  const top = Math.min(yA, yB) - 16
+  return `<svg viewBox="0 0 220 100" width="${size}" style="display:block;margin:0 auto">
+    <g stroke="#1c2333" stroke-width="1">
+      <line x1="10" y1="15" x2="210" y2="15"/><line x1="10" y1="30" x2="210" y2="30"/>
+      <line x1="10" y1="45" x2="210" y2="45"/><line x1="10" y1="60" x2="210" y2="60"/><line x1="10" y1="75" x2="210" y2="75"/>
+    </g>
+    <text x="14" y="58" font-size="42" fill="#0f2a52">&#119070;</text>
+    <ellipse cx="90" cy="${yA}" rx="7" ry="5.5" fill="#c23b3b"/>${ledgerA}
+    <ellipse cx="150" cy="${yB}" rx="7" ry="5.5" fill="#e8b64a"/>${ledgerB}
+    <path d="M90 ${top} L150 ${top}" stroke="#5c6270" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+    <text x="120" y="${top - 6}" font-size="12" fill="#5c6270" text-anchor="middle" font-weight="700">${label}</text>
+  </svg>`
+}
+
+// Hóa biểu: khuông nhạc + khóa Sol + các dấu thăng/giáng ngay sau khóa
+export function renderKeySignatureSVG(items, size = 190) {
+  let x = 34, els = ''
+  items.forEach(it => {
+    const y = notePos[it.note]
+    els += `<text x="${x}" y="${y + 6}" font-size="18" fill="#e8b64a">${it.sym}</text>`
+    x += 9
+  })
+  return `<svg viewBox="0 0 220 90" width="${size}" style="display:block;margin:0 auto">
+    <g stroke="#1c2333" stroke-width="1">
+      <line x1="10" y1="15" x2="210" y2="15"/><line x1="10" y1="30" x2="210" y2="30"/>
+      <line x1="10" y1="45" x2="210" y2="45"/><line x1="10" y1="60" x2="210" y2="60"/><line x1="10" y1="75" x2="210" y2="75"/>
+    </g>
+    <text x="14" y="58" font-size="42" fill="#0f2a52">&#119070;</text>
+    ${els}
+  </svg>`
+}
+
+// Hợp âm: 3 nốt xếp chồng trên cùng 1 khuông, dùng chung 1 đuôi nốt
+export function renderChordSVG(notesArr, size = 150) {
+  const x = 110
+  let els = ''
+  notesArr.forEach(n => {
+    const y = notePos[n]
+    els += `<ellipse cx="${x}" cy="${y}" rx="7" ry="5.5" fill="#c23b3b"/>`
+    if (n === 'C') els += `<line x1="${x - 9}" y1="86" x2="${x + 9}" y2="86" stroke="#1c2333" stroke-width="1"/>`
+  })
+  const ys = notesArr.map(n => notePos[n])
+  const top = Math.min(...ys), bottom = Math.max(...ys)
+  els += `<line x1="${x + 6.5}" y1="${bottom}" x2="${x + 6.5}" y2="${top - 30}" stroke="#0f2a52" stroke-width="1.4"/>`
+  return `<svg viewBox="0 0 220 100" width="${size}" style="display:block;margin:0 auto">
+    <g stroke="#1c2333" stroke-width="1">
+      <line x1="10" y1="15" x2="210" y2="15"/><line x1="10" y1="30" x2="210" y2="30"/>
+      <line x1="10" y1="45" x2="210" y2="45"/><line x1="10" y1="60" x2="210" y2="60"/><line x1="10" y1="75" x2="210" y2="75"/>
+    </g>
+    <text x="14" y="58" font-size="42" fill="#0f2a52">&#119070;</text>
+    ${els}
+  </svg>`
+}
+
+// Vòng hòa âm: chuỗi ô hợp âm nối tiếp nhau kèm mũi tên
+export function renderProgressionSVG(chords, size = 220) {
+  const n = chords.length, spacing = 200 / n
+  let els = ''
+  chords.forEach((c, i) => {
+    const cx = 10 + spacing * i + spacing / 2
+    els += `<rect x="${cx - 22}" y="8" width="44" height="30" rx="6" fill="none" stroke="#0f2a52" stroke-width="1.6"/>`
+    els += `<text x="${cx}" y="28" font-size="14" font-weight="700" fill="#0f2a52" text-anchor="middle">${c}</text>`
+    if (i < n - 1) els += `<line x1="${cx + 24}" y1="23" x2="${cx + spacing - 24}" y2="23" stroke="#e8b64a" stroke-width="2"/>`
+  })
+  return `<svg viewBox="0 0 220 46" width="${size}" style="display:block;margin:0 auto">${els}</svg>`
+}
+
+const _prevRenderMediaFullV2 = renderMediaFullV2
+export function renderMediaFullV3(media) {
+  if (!media) return ''
+  switch (media.kind) {
+    case 'breath': return renderBreathIcon()
+    case 'rest_compare': return renderRestCompare()
+    case 'beamed_eighths': return renderBeamedEighths()
+    case 'milestone': return renderMilestoneIcon()
+    case 'dotted_compare': return renderDottedCompare()
+    case 'forward': return renderForwardIcon()
+    case 'interval': return renderIntervalSVG(media.noteA, media.noteB, media.label)
+    case 'key_signature': return renderKeySignatureSVG(media.items || [])
+    case 'chord': return renderChordSVG(media.notes)
+    case 'progression': return renderProgressionSVG(media.chords)
+    default: return _prevRenderMediaFullV2(media)
+  }
+}

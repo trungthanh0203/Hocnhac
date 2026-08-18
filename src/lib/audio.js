@@ -76,6 +76,7 @@ export function playAudioAction(audio) {
   else if (audio.type === 'sequence') playSequence(audio.notes)
   else if (audio.type === 'click') playClick(audio.pattern)
   else if (audio.type === 'timbre') playTimbre(audio.name)
+  else if (audio.type === 'chord') playChord(audio.notes)
 }
 
 export { freq }
@@ -125,4 +126,9 @@ export function playRhythmDemo(durations, unit = 0.6) {
     o.stop(t0 + 0.14)
     t += d * unit
   })
+}
+
+// Phát hợp âm: nhiều nốt vang lên CÙNG LÚC (khác playSequence là phát lần lượt)
+export function playChord(notes, dur = 1.3) {
+  notes.forEach(n => playNote(n, dur, 0))
 }
