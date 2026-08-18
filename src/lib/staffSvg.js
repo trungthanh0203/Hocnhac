@@ -327,3 +327,34 @@ export function renderMediaFullV3(media) {
     default: return _prevRenderMediaFullV2(media)
   }
 }
+
+// ============================================================
+// BO SUNG CHO NANG CAO 1: chùm ba, nhạc cụ dân tộc
+// ============================================================
+export function renderTripletIcon(size = 140) {
+  return `<svg viewBox="0 0 130 62" width="${size}" style="display:block;margin:0 auto">
+    <ellipse cx="20" cy="45" rx="6" ry="5" fill="#0f2a52"/>
+    <ellipse cx="55" cy="45" rx="6" ry="5" fill="#0f2a52"/>
+    <ellipse cx="90" cy="45" rx="6" ry="5" fill="#0f2a52"/>
+    <line x1="26" y1="45" x2="26" y2="16" stroke="#0f2a52" stroke-width="1.4"/>
+    <line x1="61" y1="45" x2="61" y2="16" stroke="#0f2a52" stroke-width="1.4"/>
+    <line x1="96" y1="45" x2="96" y2="16" stroke="#0f2a52" stroke-width="1.4"/>
+    <path d="M26 12 L61 6 L96 12" fill="none" stroke="#0f2a52" stroke-width="1.6"/>
+    <text x="61" y="4" font-size="11" fill="#e8b64a" text-anchor="middle" font-weight="700">3</text>
+    <text x="58" y="60" font-size="10" fill="#5c6270" text-anchor="middle">Chùm ba = 3 nốt trong 1 phách</text>
+  </svg>`
+}
+
+const _instrumentIconsExtra = {
+  dan_tranh: `<svg viewBox="0 0 90 40" width="56"><rect x="4" y="6" width="82" height="24" rx="3" fill="none" stroke="#0f2a52" stroke-width="1.4"/><line x1="14" y1="6" x2="14" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="24" y1="6" x2="24" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="34" y1="6" x2="34" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="44" y1="6" x2="44" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="54" y1="6" x2="54" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="64" y1="6" x2="64" y2="30" stroke="#0f2a52" stroke-width="1"/><line x1="74" y1="6" x2="74" y2="30" stroke="#0f2a52" stroke-width="1"/></svg>`,
+  dan_bau: `<svg viewBox="0 0 90 40" width="56"><path d="M10 30 Q45 8 80 30" fill="none" stroke="#0f2a52" stroke-width="1.6"/><circle cx="14" cy="30" r="5" fill="none" stroke="#e8b64a" stroke-width="1.6"/><line x1="19" y1="28" x2="80" y2="30" stroke="#0f2a52" stroke-width="1"/></svg>`,
+  sao_truc: `<svg viewBox="0 0 90 26" width="60"><rect x="4" y="10" width="82" height="7" rx="3" fill="none" stroke="#0f2a52" stroke-width="1.4"/><circle cx="22" cy="13.5" r="1.6" fill="#0f2a52"/><circle cx="34" cy="13.5" r="1.6" fill="#0f2a52"/><circle cx="46" cy="13.5" r="1.6" fill="#0f2a52"/><circle cx="58" cy="13.5" r="1.6" fill="#0f2a52"/><circle cx="70" cy="13.5" r="1.6" fill="#0f2a52"/></svg>`,
+}
+Object.assign(INSTRUMENT_ICONS, _instrumentIconsExtra)
+
+const _prevRenderMediaFullV3 = renderMediaFullV3
+export function renderMediaFullV4(media) {
+  if (!media) return ''
+  if (media.kind === 'triplet') return renderTripletIcon()
+  return _prevRenderMediaFullV3(media)
+}

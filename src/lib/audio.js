@@ -68,6 +68,9 @@ export function playTimbre(name) {
   else if (name === 'guitar') playNote('E', 0.9, 0, 'sawtooth')
   else if (name === 'violin') playNote('A', 1.3, 0, 'sawtooth')
   else if (name === 'drum') playDrum()
+  else if (name === 'dan_tranh') playNote('A', 0.7, 0, 'sine')
+  else if (name === 'dan_bau') playNote('D', 1.4, 0, 'sawtooth')
+  else if (name === 'sao_truc') playNote('E', 1.0, 0, 'sine')
 }
 
 export function playAudioAction(audio) {
