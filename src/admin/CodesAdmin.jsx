@@ -14,7 +14,8 @@ function generateCode() {
 export default function CodesAdmin() {
   const [levels, setLevels] = useState([])
   const [codes, setCodes] = useState([])
-  const [newLevelId, setNewLevelId] = useState('all')
+  const [selectAll, setSelectAll] = useState(true)
+  const [selectedLevelIds, setSelectedLevelIds] = useState([])
   const [newDays, setNewDays] = useState(30)
   const [newNote, setNewNote] = useState('')
   const [msg, setMsg] = useState(null)
@@ -25,20 +26,33 @@ export default function CodesAdmin() {
   }, [])
 
   function reload() {
-    supabase.from('activation_codes').select('*, levels(name)').order('created_at', { ascending: false }).then(({ data }) => setCodes(data || []))
+    supabase.from('activation_codes').select('*').order('created_at', { ascending: false }).then(({ data }) => setCodes(data || []))
+  }
+
+  function levelNames(ids) {
+    if (ids === null || ids === undefined) return 'Tất cả 9 cấp'
+    return ids.map(id => levels.find(l => l.id === id)?.name || `#${id}`).join(', ')
+  }
+
+  function toggleLevel(id) {
+    setSelectedLevelIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
   }
 
   async function createCode() {
+    if (!selectAll && selectedLevelIds.length === 0) {
+      setMsg({ type: 'error', text: 'Chọn ít nhất 1 cấp, hoặc tick "Mở tất cả 9 cấp".' })
+      return
+    }
     const code = generateCode()
     const expiresAt = new Date(Date.now() + newDays * 86400000).toISOString()
     const { error } = await supabase.from('activation_codes').insert({
       code,
-      unlock_level_id: newLevelId === 'all' ? null : Number(newLevelId),
+      unlock_level_ids: selectAll ? null : selectedLevelIds,
       expires_at: expiresAt,
       note: newNote || null,
     })
     setMsg({ type: error ? 'error' : 'success', text: error ? error.message : `Đã tạo mã: ${code}` })
-    if (!error) { setNewNote(''); reload() }
+    if (!error) { setNewNote(''); setSelectedLevelIds([]); reload() }
   }
 
   async function revoke(id) {
@@ -56,14 +70,28 @@ export default function CodesAdmin() {
   return (
     <div className="admin-panel">
       <h3 style={{ fontSize: 14, color: 'var(--navy)', marginBottom: 10 }}>Tạo mã kích hoạt mới</h3>
-      <div className="admin-row">
+
+      <div className="admin-row" style={{ alignItems: 'flex-start' }}>
         <div className="admin-field">
-          <label>Mở cấp</label>
-          <select value={newLevelId} onChange={e => setNewLevelId(e.target.value)}>
-            <option value="all">Tất cả 9 cấp</option>
-            {levels.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-          </select>
+          <label>Mở cấp nào</label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, marginBottom: 8, fontWeight: 600 }}>
+            <input type="checkbox" checked={selectAll} onChange={e => { setSelectAll(e.target.checked); if (e.target.checked) setSelectedLevelIds([]) }} />
+            Mở tất cả 9 cấp
+          </label>
+          {!selectAll && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px 14px', padding: '8px 12px', border: '1.5px solid var(--line)', borderRadius: 8, minWidth: 380 }}>
+              {levels.map(l => (
+                <label key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5 }}>
+                  <input type="checkbox" checked={selectedLevelIds.includes(l.id)} onChange={() => toggleLevel(l.id)} />
+                  {l.name}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
+
+      <div className="admin-row">
         <div className="admin-field">
           <label>Hạn dùng (số ngày)</label>
           <input type="number" min="1" value={newDays} onChange={e => setNewDays(Number(e.target.value))} style={{ width: 90 }} />
@@ -85,7 +113,7 @@ export default function CodesAdmin() {
             return (
               <tr key={c.id}>
                 <td style={{ fontFamily: 'monospace', fontWeight: 700 }}>{c.code}</td>
-                <td>{c.levels?.name || 'Tất cả 9 cấp'}</td>
+                <td>{levelNames(c.unlock_level_ids)}</td>
                 <td>{c.expires_at ? new Date(c.expires_at).toLocaleDateString('vi-VN') : '—'}</td>
                 <td><span className={'admin-badge ' + s.cls}>{s.label}</span></td>
                 <td>{c.note || ''}</td>

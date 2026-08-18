@@ -90,7 +90,7 @@ create table if not exists questions (
 create table if not exists activation_codes (
   id serial primary key,
   code text unique not null,
-  unlock_level_id int references levels(id),   -- null = mở tất cả 9 cấp
+  unlock_level_ids int[],   -- null = mở tất cả 9 cấp; mảng = mở đúng các cấp trong danh sách
   expires_at timestamptz,
   created_at timestamptz default now(),
   used_by uuid references auth.users(id),
@@ -150,6 +150,7 @@ security definer
 as $$
 declare
   rec activation_codes%rowtype;
+  lvl int;
 begin
   select * into rec from activation_codes where code = code_input;
 
@@ -166,9 +167,17 @@ begin
   end if;
 
   update activation_codes set used_by = auth.uid(), used_at = now() where id = rec.id;
-  insert into student_access(user_id, level_id) values (auth.uid(), rec.unlock_level_id);
 
-  return jsonb_build_object('success', true, 'level_id', rec.unlock_level_id);
+  if rec.unlock_level_ids is null then
+    -- null = mở tất cả 9 cấp
+    insert into student_access(user_id, level_id) values (auth.uid(), null);
+  else
+    foreach lvl in array rec.unlock_level_ids loop
+      insert into student_access(user_id, level_id) values (auth.uid(), lvl);
+    end loop;
+  end if;
+
+  return jsonb_build_object('success', true, 'level_ids', rec.unlock_level_ids);
 end;
 $$;
 
