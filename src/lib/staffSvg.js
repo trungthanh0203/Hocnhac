@@ -91,3 +91,58 @@ export function renderMedia(media) {
 }
 
 export { notePos }
+
+// ============================================================
+// Bộ 12 icon minh họa nhỏ (dùng trong Ôn tập, cho "kind":"icon","index":N)
+// Port nguyên vẹn từ bản demo đã duyệt
+// ============================================================
+const ICONS_RAW = [
+  `<g stroke="#0f2a52" stroke-width="1.4"><line x1="4" y1="16" x2="60" y2="16"/><line x1="4" y1="25" x2="60" y2="25"/><line x1="4" y1="34" x2="60" y2="34"/><line x1="4" y1="43" x2="60" y2="43"/><line x1="4" y1="52" x2="60" y2="52"/></g><text x="6" y="46" font-size="36" fill="#0f2a52">&#119070;</text>`,
+  `<polyline points="6,52 14,45 22,38 30,31 38,24 46,17 54,10" fill="none" stroke="#0f2a52" stroke-width="1.3"/><g fill="#e8b64a"><circle cx="6" cy="52" r="3"/><circle cx="14" cy="45" r="3"/><circle cx="22" cy="38" r="3"/><circle cx="30" cy="31" r="3"/><circle cx="38" cy="24" r="3"/><circle cx="46" cy="17" r="3"/><circle cx="54" cy="10" r="3"/></g>`,
+  `<g stroke="#0f2a52" stroke-width="1.2"><line x1="4" y1="14" x2="60" y2="14"/><line x1="4" y1="23" x2="60" y2="23"/><line x1="4" y1="32" x2="60" y2="32"/><line x1="4" y1="41" x2="60" y2="41"/><line x1="4" y1="50" x2="60" y2="50"/></g><circle cx="20" cy="23" r="4" fill="#e8b64a"/><circle cx="42" cy="27.5" r="4" fill="#0f2a52"/>`,
+  `<text x="4" y="38" font-size="34" fill="#0f2a52">&#9839;</text><text x="34" y="54" font-size="28" fill="#e8b64a">&#9837;</text>`,
+  `<polygon points="18,54 46,54 32,8" fill="none" stroke="#0f2a52" stroke-width="1.4"/><line x1="32" y1="50" x2="44" y2="16" stroke="#e8b64a" stroke-width="2.2"/><circle cx="44" cy="16" r="3.4" fill="#e8b64a"/>`,
+  `<line x1="12" y1="32" x2="52" y2="32" stroke="#0f2a52" stroke-width="1.6"/><text x="24" y="26" font-size="22" fill="#0f2a52" font-weight="bold">2</text><text x="24" y="54" font-size="22" fill="#e8b64a" font-weight="bold">4</text>`,
+  `<ellipse cx="16" cy="46" rx="8" ry="6" fill="#0f2a52"/><line x1="23" y1="46" x2="23" y2="12" stroke="#0f2a52" stroke-width="1.6"/><ellipse cx="46" cy="46" rx="8" ry="6" fill="none" stroke="#e8b64a" stroke-width="1.8"/><line x1="53" y1="46" x2="53" y2="12" stroke="#e8b64a" stroke-width="1.6"/>`,
+  `<rect x="26" y="6" width="12" height="26" rx="6" fill="#0f2a52"/><path d="M18 26 a14 14 0 0 0 28 0" fill="none" stroke="#0f2a52" stroke-width="2"/><line x1="32" y1="40" x2="32" y2="54" stroke="#0f2a52" stroke-width="2"/><line x1="22" y1="54" x2="42" y2="54" stroke="#0f2a52" stroke-width="2"/><path d="M46 16 q6 6 0 12" fill="none" stroke="#e8b64a" stroke-width="2"/>`,
+  `<path d="M6 40 Q20 12 32 30 T58 20" fill="none" stroke="#0f2a52" stroke-width="1.6"/><circle cx="6" cy="40" r="3" fill="#e8b64a"/><circle cx="32" cy="30" r="3" fill="#e8b64a"/><circle cx="58" cy="20" r="3" fill="#e8b64a"/>`,
+  `<polyline points="8,48 20,38 32,28 44,18 56,10" fill="none" stroke="#0f2a52" stroke-width="1.3"/><g fill="#e8b64a"><circle cx="8" cy="48" r="3.4"/><circle cx="20" cy="38" r="3.4"/><circle cx="32" cy="28" r="3.4"/><circle cx="44" cy="18" r="3.4"/><circle cx="56" cy="10" r="3.4"/></g>`,
+  `<g stroke="#0f2a52" stroke-width="1.6" fill="none"><line x1="10" y1="50" x2="10" y2="12"/><polyline points="6,18 10,12 14,18"/><polyline points="6,44 10,50 14,44"/><circle cx="32" cy="32" r="12"/><line x1="32" y1="32" x2="32" y2="23"/><line x1="32" y1="32" x2="39" y2="35"/></g><path d="M48 24 h6 l8 -8 v32 l-8 -8 h-6 z" fill="#e8b64a" stroke="none"/>`,
+  `<g stroke="#0f2a52" stroke-width="1.2" fill="none"><rect x="3" y="4" width="24" height="14" rx="2"/><line x1="9" y1="4" x2="9" y2="18"/><line x1="15" y1="4" x2="15" y2="18"/><line x1="21" y1="4" x2="21" y2="18"/><circle cx="46" cy="11" r="8"/><circle cx="46" cy="11" r="3" fill="#e8b64a" stroke="none"/><ellipse cx="14" cy="46" rx="10" ry="6"/><rect x="4" y="40" width="20" height="6"/><path d="M44 34 q6 -10 12 0 q6 10 -6 16 q-12 -6 -6 -16 z"/></g>`,
+]
+
+export function renderIcon(index, size = 30) {
+  const raw = ICONS_RAW[index % ICONS_RAW.length]
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" aria-hidden="true">${raw}</svg>`
+}
+
+// ============================================================
+// Icon riêng cho bài "Âm nhạc là gì?" (3 yếu tố) và "Nhạc cụ quen thuộc"
+// ============================================================
+export const pitchIcon = `<svg viewBox="0 0 40 40" width="46"><line x1="20" y1="34" x2="20" y2="6" stroke="#0f2a52" stroke-width="2"/><polyline points="12,14 20,6 28,14" fill="none" stroke="#0f2a52" stroke-width="2"/></svg>`
+export const durationIcon = `<svg viewBox="0 0 40 40" width="46"><circle cx="20" cy="20" r="14" fill="none" stroke="#0f2a52" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="10" stroke="#0f2a52" stroke-width="2"/><line x1="20" y1="20" x2="27" y2="23" stroke="#0f2a52" stroke-width="2"/></svg>`
+export const volumeIcon = `<svg viewBox="0 0 40 40" width="46"><path d="M6 16 h6 l9 -9 v26 l-9 -9 h-6 z" fill="#e8b64a"/><path d="M28 12 q6 8 0 16" fill="none" stroke="#0f2a52" stroke-width="2"/></svg>`
+
+const INSTRUMENT_ICONS = {
+  piano: `<svg viewBox="0 0 40 26" width="56"><rect x="2" y="2" width="36" height="20" rx="2" fill="none" stroke="#0f2a52" stroke-width="1.4"/><line x1="10" y1="2" x2="10" y2="22" stroke="#0f2a52" stroke-width="1.2"/><line x1="18" y1="2" x2="18" y2="22" stroke="#0f2a52" stroke-width="1.2"/><line x1="26" y1="2" x2="26" y2="22" stroke="#0f2a52" stroke-width="1.2"/><line x1="34" y1="2" x2="34" y2="22" stroke="#0f2a52" stroke-width="1.2"/></svg>`,
+  guitar: `<svg viewBox="0 0 40 50" width="46"><line x1="20" y1="18" x2="20" y2="2" stroke="#0f2a52" stroke-width="3"/><circle cx="20" cy="32" r="14" fill="none" stroke="#0f2a52" stroke-width="1.6"/><circle cx="20" cy="32" r="5" fill="#e8b64a"/></svg>`,
+  drum: `<svg viewBox="0 0 40 34" width="52"><ellipse cx="20" cy="8" rx="16" ry="6" fill="none" stroke="#0f2a52" stroke-width="1.4"/><line x1="4" y1="8" x2="4" y2="26" stroke="#0f2a52" stroke-width="1.4"/><line x1="36" y1="8" x2="36" y2="26" stroke="#0f2a52" stroke-width="1.4"/><ellipse cx="20" cy="26" rx="16" ry="6" fill="none" stroke="#0f2a52" stroke-width="1.4"/></svg>`,
+  violin: `<svg viewBox="0 0 30 50" width="38"><path d="M15 4 q10 6 6 16 q-4 6 0 12 q4 6 -6 12 q-10 -6 -6 -12 q4 -6 0 -12 q-4 -10 6 -16 z" fill="none" stroke="#0f2a52" stroke-width="1.4"/></svg>`,
+}
+export function renderInstrumentIcon(name) {
+  return INSTRUMENT_ICONS[name] || ''
+}
+
+// Cập nhật dispatcher renderMedia để nhận thêm các kind mới
+const _origRenderMedia = renderMedia
+export function renderMediaFull(media) {
+  if (!media) return ''
+  switch (media.kind) {
+    case 'icon': return renderIcon(media.index)
+    case 'pitch_icon': return pitchIcon
+    case 'duration_icon': return durationIcon
+    case 'volume_icon': return volumeIcon
+    case 'instrument_icon': return renderInstrumentIcon(media.name)
+    default: return _origRenderMedia(media)
+  }
+}

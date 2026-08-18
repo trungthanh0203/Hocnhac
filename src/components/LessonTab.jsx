@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
-import { renderMedia } from '../lib/staffSvg.js'
+import { renderMediaFull } from '../lib/staffSvg.js'
 import { playAudioAction } from '../lib/audio.js'
 
 // Tab "Bài học" — lấy dữ liệu THẬT từ Supabase (bảng lessons + lesson_points)
@@ -93,7 +93,7 @@ export default function LessonTab({ levelId = 1, isPaidAccount = false }) {
             <div className="point-body">
               <h4>{p.heading}</h4>
               <p>{p.body}</p>
-              {p.media && <div className="point-img" dangerouslySetInnerHTML={{ __html: renderMedia(p.media) }} />}
+              {p.media && <div className="point-img" dangerouslySetInnerHTML={{ __html: renderMediaFull(p.media) }} />}
               {p.audio && (
                 <span className="mini-play" onClick={() => playAudioAction(p.audio)}>
                   🔊 {p.audio.label}

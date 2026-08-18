@@ -79,3 +79,50 @@ export function playAudioAction(audio) {
 }
 
 export { freq }
+
+// Bổ sung cho tab Thực hành: phát 1 bản nhạc nhiều nốt theo trường độ,
+// trả về tổng thời lượng (giây) và gọi onNoteStart(gid) đúng lúc từng nốt vang lên
+export function playScore(flatNotes, onNoteStart, unit = 0.5) {
+  const c = ac()
+  let t = 0
+  flatNotes.forEach(n => {
+    const dur = n.dur * unit
+    const t0 = c.currentTime + t
+    const o = c.createOscillator()
+    const g = c.createGain()
+    o.type = 'triangle'
+    o.frequency.value = freq[n.note]
+    g.gain.setValueAtTime(0.0001, t0)
+    g.gain.exponentialRampToValueAtTime(0.55, t0 + 0.02)
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur * 0.95)
+    o.connect(g)
+    g.connect(c.destination)
+    o.start(t0)
+    o.stop(t0 + dur)
+    if (onNoteStart) setTimeout(() => onNoteStart(n.gid), t * 1000)
+    t += dur
+  })
+  if (onNoteStart) setTimeout(() => onNoteStart(-1), t * 1000)
+  return t
+}
+
+// Bổ sung cho Luyện âm: phát mẫu tiết tấu với khoảng cách biến thiên theo trường độ
+export function playRhythmDemo(durations, unit = 0.6) {
+  const c = ac()
+  let t = 0
+  durations.forEach((d, i) => {
+    const t0 = c.currentTime + t
+    const o = c.createOscillator()
+    const g = c.createGain()
+    o.type = 'square'
+    o.frequency.value = i === 0 ? 900 : 650
+    g.gain.setValueAtTime(0.0001, t0)
+    g.gain.exponentialRampToValueAtTime(i === 0 ? 0.5 : 0.35, t0 + 0.005)
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.12)
+    o.connect(g)
+    g.connect(c.destination)
+    o.start(t0)
+    o.stop(t0 + 0.14)
+    t += d * unit
+  })
+}

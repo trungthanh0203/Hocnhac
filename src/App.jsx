@@ -1,33 +1,65 @@
-import { useState } from 'react'
-import Banner from './components/Banner.jsx'
+import { useEffect, useState } from 'react'
+import { supabase } from './supabaseClient.js'
 import TabBar from './components/TabBar.jsx'
+import RoadmapPanel from './components/RoadmapPanel.jsx'
+import AuthPanel from './components/AuthPanel.jsx'
+import Footer from './components/Footer.jsx'
 import LessonTab from './components/LessonTab.jsx'
-import StubTab from './components/StubTab.jsx'
-
-// TODO (giai đoạn tiếp theo):
-// - isPaidAccount hiện đang hard-code false (tài khoản demo). Khi làm màn đăng nhập +
-//   nhập mã kích hoạt (gọi RPC redeem_code trong schema.sql), thay giá trị này bằng
-//   trạng thái đăng nhập thật lấy từ Supabase Auth + bảng student_access.
-// - currentLevelId hiện hard-code = 1 (Sơ cấp 1). Sau khi có đăng nhập, lấy cấp cao nhất
-//   học viên đã mở từ student_access để hiển thị đúng "Lộ trình của tôi".
-// - ReviewTab / EarTrainingTab / TestTab / PracticeTab: port theo đúng mẫu LessonTab.jsx,
-//   dùng lib/audio.js + lib/staffSvg.js đã có sẵn. Toàn bộ logic UI/UX đã chốt trong demo.
+import ReviewTab from './components/ReviewTab.jsx'
+import EarTrainingTab from './components/EarTrainingTab.jsx'
+import TestTab from './components/TestTab.jsx'
+import PracticeTab from './components/PracticeTab.jsx'
+import { useAuth } from './hooks/useAuth.js'
 
 export default function App() {
   const [tab, setTab] = useState('lesson')
-  const currentLevelId = 1
-  const isPaidAccount = false
+  const [authOpen, setAuthOpen] = useState(false)
+  const [roadmapOpen, setRoadmapOpen] = useState(false)
+  const [activeLevelId, setActiveLevelId] = useState(1) // Sơ cấp 1 làm mặc định khi mở app
+  const [activeLevelName, setActiveLevelName] = useState('Sơ cấp 1')
+  const auth = useAuth()
+  const isPaidAccount = auth.isLevelUnlocked(activeLevelId)
+
+  useEffect(() => {
+    supabase.from('levels').select('id, name').eq('id', activeLevelId).single()
+      .then(({ data }) => { if (data) setActiveLevelName(data.name) })
+  }, [activeLevelId])
+
+  function handleSelectLevel(levelId) {
+    setActiveLevelId(levelId)
+    setRoadmapOpen(false)
+  }
 
   return (
     <div className="phone">
-      <Banner accountLabel={isPaidAccount ? 'Tài khoản đã kích hoạt' : 'Tài khoản Demo · 3 bài / mục'} />
+      <div className="banner">
+        <h1>Học nhạc cùng Mr.Thành</h1>
+        <p>{activeLevelName} · {isPaidAccount ? 'đã kích hoạt' : 'chế độ demo, 3 bài mỗi mục'}</p>
+        <div className="banner-row">
+          <span className="badge">{isPaidAccount ? 'Tài khoản đã kích hoạt' : 'Tài khoản Demo · 3 bài / mục'}</span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="roadmap-btn" onClick={() => setRoadmapOpen(o => !o)}>
+              Lộ trình <span style={{ fontSize: 9, marginLeft: 3 }}>{roadmapOpen ? '▲' : '▼'}</span>
+            </button>
+            <button className="roadmap-btn" onClick={() => setAuthOpen(o => !o)}>
+              {auth.user ? 'Tài khoản' : 'Đăng nhập'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <RoadmapPanel auth={auth} currentLevelId={activeLevelId} open={roadmapOpen} onSelectLevel={handleSelectLevel} />
+      <AuthPanel auth={auth} open={authOpen} onClose={() => setAuthOpen(false)} />
+
       <TabBar active={tab} onChange={setTab} />
 
-      {tab === 'lesson' && <LessonTab levelId={currentLevelId} isPaidAccount={isPaidAccount} />}
-      {tab === 'review' && <StubTab title="Ôn tập" note="TODO: port từ demo — lướt xem gộp concepts + questions từ Supabase, xáo trộn ngẫu nhiên, không chấm điểm." />}
-      {tab === 'ear' && <StubTab title="Luyện âm" note="TODO: port từ demo — 5 dạng luyện tai (so sánh cao độ, giống/khác, đoán tên nốt, đếm phách, vỗ tay tiết tấu), sinh câu hỏi ngẫu nhiên phía client dựa trên phạm vi nốt của cấp đang học." />}
-      {tab === 'test' && <StubTab title="Bài test" note="TODO: port từ demo — lấy ngẫu nhiên 6 câu từ bảng questions theo levelId, hiện hết trên 1 trang, chấm điểm 1 lần, tô xanh/đỏ + lời khen theo mức điểm." />}
-      {tab === 'practice' && <StubTab title="Thực hành" note="TODO: port từ demo — bản nhạc gốc 'Vui đến trường', đọc từng nốt + nghe cả bài kèm hiệu ứng nốt sáng theo giai điệu." />}
+      {tab === 'lesson' && <LessonTab levelId={activeLevelId} isPaidAccount={isPaidAccount} />}
+      {tab === 'review' && <ReviewTab levelId={activeLevelId} />}
+      {tab === 'ear' && <EarTrainingTab levelId={activeLevelId} />}
+      {tab === 'test' && <TestTab levelId={activeLevelId} />}
+      {tab === 'practice' && <PracticeTab />}
+
+      <Footer />
     </div>
   )
 }
