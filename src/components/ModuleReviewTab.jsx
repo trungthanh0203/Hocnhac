@@ -9,10 +9,23 @@ const MODULE_NAMES = ['Nhạc lý', 'Tiết tấu', 'Xướng âm', 'Hòa âm', 
 // Khác với Ôn tập theo cấp (xáo trộn ngẫu nhiên), ở đây GIỮ ĐÚNG THỨ TỰ tiến trình
 // từ Sơ cấp đến Nâng cao, vì mục tiêu của người học theo module là đi theo lộ trình.
 export default function ModuleReviewTab({ auth }) {
-  const [moduleName, setModuleName] = useState('Xướng âm')
+  const [moduleName, setModuleName] = useState(null)
   const [levels, setLevels] = useState([])
   const [loading, setLoading] = useState(true)
   const [index, setIndex] = useState(0)
+
+  const availableModules = useMemo(() => {
+    if (auth.accountMode === 'module' && auth.unlockedModuleNames.length > 0) {
+      return MODULE_NAMES.filter(n => auth.unlockedModuleNames.includes(n))
+    }
+    return MODULE_NAMES
+  }, [auth.accountMode, auth.unlockedModuleNames])
+
+  useEffect(() => {
+    if (!moduleName || !availableModules.includes(moduleName)) {
+      setModuleName(availableModules[0] || null)
+    }
+  }, [availableModules]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function load() {
@@ -57,7 +70,7 @@ export default function ModuleReviewTab({ auth }) {
     <div className="panel">
       <div className="lesson-eyebrow" style={{ marginBottom: 8 }}>Ôn tập theo module · xuyên suốt cả 9 cấp</div>
       <div className="chip-row">
-        {MODULE_NAMES.map(name => (
+        {availableModules.map(name => (
           <div key={name} className={'chip' + (moduleName === name ? ' active' : '')} onClick={() => setModuleName(name)}>{name}</div>
         ))}
       </div>

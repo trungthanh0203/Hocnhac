@@ -1,6 +1,9 @@
 import { useState } from 'react'
 
-// Panel đăng nhập / đăng ký / nhập mã kích hoạt — mở ra dạng thả xuống từ Banner
+// Panel đăng nhập / đăng ký / nhập mã kích hoạt — mở ra dạng thả xuống từ Banner.
+// Tài khoản ĐÃ kích hoạt (theo cấp hoặc theo module) -> giao diện thu gọn, chỉ hiện
+// trạng thái + nút đăng xuất (có nút phụ "Nhập mã khác" để mở thêm khi cần mua thêm).
+// Tài khoản CHƯA kích hoạt -> giữ nguyên form đầy đủ như trước.
 export default function AuthPanel({ auth, open, onClose }) {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
@@ -8,6 +11,7 @@ export default function AuthPanel({ auth, open, onClose }) {
   const [code, setCode] = useState('')
   const [msg, setMsg] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [showRedeemMore, setShowRedeemMore] = useState(false)
 
   if (!open) return null
 
@@ -29,6 +33,8 @@ export default function AuthPanel({ auth, open, onClose }) {
     if (result.success) setCode('')
   }
 
+  const isActivated = auth.accountMode === 'level' || auth.accountMode === 'module'
+
   return (
     <div className="roadmap-panel">
       <div style={{ padding: 16 }}>
@@ -45,6 +51,23 @@ export default function AuthPanel({ auth, open, onClose }) {
                 style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 8, border: '1.5px solid var(--line)' }} />
               <button className="next-btn" disabled={busy} type="submit">{mode === 'signin' ? 'Đăng nhập' : 'Tạo tài khoản'}</button>
             </form>
+          </>
+        ) : isActivated ? (
+          <>
+            <div style={{ fontSize: 13, marginBottom: 4 }}><strong>{auth.user.email}</strong></div>
+            <div style={{ fontSize: 12.5, color: 'var(--green)', fontWeight: 600, marginBottom: 12 }}>
+              Đã kích hoạt {auth.accountMode === 'module' ? 'theo module' : 'theo cấp học'}
+            </div>
+            {!showRedeemMore ? (
+              <button className="nav-btn" style={{ width: '100%', marginBottom: 8 }} onClick={() => setShowRedeemMore(true)}>Nhập mã khác</button>
+            ) : (
+              <form onSubmit={handleRedeem}>
+                <input type="text" required placeholder="Nhập mã kích hoạt" value={code} onChange={e => setCode(e.target.value)}
+                  style={{ width: '100%', padding: 10, marginBottom: 10, borderRadius: 8, border: '1.5px solid var(--line)' }} />
+                <button className="next-btn" disabled={busy} type="submit">Kích hoạt mã</button>
+              </form>
+            )}
+            <button className="nav-btn" style={{ marginTop: 8, width: '100%' }} onClick={auth.signOut}>Đăng xuất</button>
           </>
         ) : (
           <>

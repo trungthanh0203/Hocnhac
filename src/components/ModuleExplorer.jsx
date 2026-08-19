@@ -8,10 +8,25 @@ const MODULE_NAMES = ['Nhạc lý', 'Tiết tấu', 'Xướng âm', 'Hòa âm', 
 // thành 1 chuỗi bài liên tục theo đúng thứ tự tăng dần độ khó. Giao diện chọn theo
 // đúng kiểu 2 dropdown như tab "Bài học" (Module -> Bài học) cho quen mắt, gọn hơn dãy chip.
 export default function ModuleExplorer({ auth }) {
-  const [moduleName, setModuleName] = useState('Xướng âm')
+  const [moduleName, setModuleName] = useState(null)
   const [levels, setLevels] = useState([])
   const [loading, setLoading] = useState(true)
   const [index, setIndex] = useState(0)
+
+  // Tài khoản đã mua THEO MODULE -> chỉ hiện đúng (những) module đã mua trong dropdown.
+  // Tài khoản demo hoặc mua theo cấp (đang bấm sang xem thử) -> vẫn hiện đủ 5 module để khám phá.
+  const availableModules = useMemo(() => {
+    if (auth.accountMode === 'module' && auth.unlockedModuleNames.length > 0) {
+      return MODULE_NAMES.filter(n => auth.unlockedModuleNames.includes(n))
+    }
+    return MODULE_NAMES
+  }, [auth.accountMode, auth.unlockedModuleNames])
+
+  useEffect(() => {
+    if (!moduleName || !availableModules.includes(moduleName)) {
+      setModuleName(availableModules[0] || null)
+    }
+  }, [availableModules]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function load() {
@@ -66,8 +81,8 @@ export default function ModuleExplorer({ auth }) {
       <div className="select-row">
         <div className="select-field narrow">
           <label>Module</label>
-          <select value={moduleName} onChange={e => setModuleName(e.target.value)}>
-            {MODULE_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
+          <select value={moduleName || ''} onChange={e => setModuleName(e.target.value)}>
+            {availableModules.map(name => <option key={name} value={name}>{name}</option>)}
           </select>
         </div>
         <div className="select-field wide">

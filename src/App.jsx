@@ -51,11 +51,13 @@ export default function App() {
           {learnMode === 'module' ? 'Học theo module' : activeLevelName} ·{' '}
           {auth.accountMode === 'demo' ? 'chế độ demo, 3 bài mỗi mục' : 'đã kích hoạt'}
         </p>
-        <div className="banner-row">
+        <div className="banner-row" style={{ flexWrap: 'wrap', rowGap: 8 }}>
           <span className="badge">
-            {auth.accountMode === 'level' ? 'Tài khoản đã kích hoạt · theo cấp'
-              : auth.accountMode === 'module' ? 'Tài khoản đã kích hoạt · theo module'
-              : 'Tài khoản Demo · 3 bài / mục'}
+            {!auth.user
+              ? 'Tài khoản Demo · 3 bài / mục'
+              : auth.accountMode === 'level' ? `${auth.user.email} đã kích hoạt theo cấp học`
+              : auth.accountMode === 'module' ? `${auth.user.email} đã kích hoạt theo module`
+              : `${auth.user.email} chưa kích hoạt`}
           </span>
           <div style={{ display: 'flex', gap: 6 }}>
             {learnMode === 'level' && (
