@@ -4,6 +4,7 @@ import TabBar from './components/TabBar.jsx'
 import RoadmapPanel from './components/RoadmapPanel.jsx'
 import AuthPanel from './components/AuthPanel.jsx'
 import Footer from './components/Footer.jsx'
+import InstallPrompt from './components/InstallPrompt.jsx'
 import LessonTab from './components/LessonTab.jsx'
 import ReviewTab from './components/ReviewTab.jsx'
 import EarTrainingTab from './components/EarTrainingTab.jsx'
@@ -33,6 +34,7 @@ export default function App() {
 
   return (
     <div className="phone">
+      <InstallPrompt />
       <div className="banner">
         <h1>Học nhạc cùng Mr.Thành</h1>
         <p>{activeLevelName} · {isPaidAccount ? 'đã kích hoạt' : 'chế độ demo, 3 bài mỗi mục'}</p>
