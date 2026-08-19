@@ -1,3 +1,13 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xem trước giao diện mới</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
 :root{
   --navy:#1b2b65; --navy2:#3454d1; --gold:#ffb627; --gold-soft:#fff2d6;
   --coral:#ff6f59; --coral-soft:#ffe4df; --mint:#2ec4b6; --mint-soft:#dff7f4;
@@ -145,3 +155,81 @@ h1, h2, .lesson-title, .banner h1, .roadmap-name, .footer-title{
 .select-field label{font-size:10.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;}
 .select-field select{padding:9px 10px; border-radius:12px; border:1.5px solid var(--line); font-size:13px; width:100%; background:#fff;}
 .select-field select:disabled{color:var(--muted); background:var(--bg);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="banner">
+    <h1>Học nhạc cùng Mr.Thành</h1>
+    <p>Sơ cấp 1 · chế độ demo, 3 bài mỗi mục</p>
+    <div class="banner-row">
+      <span class="badge">Tài khoản Demo · 3 bài / mục</span>
+      <div style="display:flex;gap:6px">
+        <button class="roadmap-btn">Lộ trình ▼</button>
+        <button class="roadmap-btn">Đăng nhập</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Bài học</div>
+    <div class="tab">Ôn tập</div>
+    <div class="tab">Luyện âm</div>
+    <div class="tab">Bài test</div>
+    <div class="tab">Thực hành</div>
+  </div>
+
+  <div class="panel">
+    <div class="select-row">
+      <div class="select-field narrow"><label>Module</label><select><option>Nhạc lý</option></select></div>
+      <div class="select-field wide"><label>Bài học</label><select><option>Bài 1: Khuông nhạc và khóa Sol</option></select></div>
+    </div>
+
+    <div class="lesson-box">
+      <div class="lesson-eyebrow">Nhạc lý</div>
+      <div class="lesson-title">Khuông nhạc và khóa Sol</div>
+      <div class="lesson-goal">🎯 Mục tiêu: Sau bài này, bạn nhận diện được khuông nhạc và biết khóa Sol dùng để làm gì.</div>
+      <div class="point">
+        <div class="num">1</div>
+        <div class="point-body">
+          <h4>Khuông nhạc là gì</h4>
+          <p>Gồm 5 dòng kẻ song song và 4 khe ở giữa, dùng để ghi vị trí cao độ của nốt nhạc.</p>
+          <span class="mini-play">🔊 Nghe nốt Sol</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-nav">
+      <button class="nav-btn" disabled>← Trước</button>
+      <span class="progress">Bài 1 / 12</span>
+      <button class="nav-btn">Sau →</button>
+    </div>
+  </div>
+
+  <div style="padding:0 16px 16px">
+    <div class="chip-row">
+      <div class="chip active">So sánh cao độ</div>
+      <div class="chip">Đoán tên nốt</div>
+    </div>
+    <div class="test-card" style="text-align:center">
+      <div class="test-q">Nghe 2 nốt và cho biết nốt nào cao hơn:</div>
+      <button class="play-btn">▶</button>
+    </div>
+    <div class="options" style="margin-top:10px">
+      <div class="opt correct">Nốt 1</div>
+      <div class="opt wrong">Nốt 2</div>
+    </div>
+    <button class="next-btn">Câu tiếp theo</button>
+  </div>
+
+  <div class="footer">
+    <div class="footer-title">Liên hệ Mr.Thành</div>
+    <div class="footer-sub">Nhắn tin để nhận mã kích hoạt, mở khóa toàn bộ 9 cấp học</div>
+    <div class="footer-links">
+      <span class="footer-chip">📱 Zalo: 0989.099.454</span>
+      <span class="footer-chip">📧 Email: trungthanh0203@gmail.com</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
