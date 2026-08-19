@@ -17,12 +17,13 @@ export default function App() {
   const [roadmapOpen, setRoadmapOpen] = useState(false)
   const [activeLevelId, setActiveLevelId] = useState(1) // Sơ cấp 1 làm mặc định khi mở app
   const [activeLevelName, setActiveLevelName] = useState('Sơ cấp 1')
+  const [activeLevelTier, setActiveLevelTier] = useState('Sơ cấp')
   const auth = useAuth()
   const isPaidAccount = auth.isLevelUnlocked(activeLevelId)
 
   useEffect(() => {
-    supabase.from('levels').select('id, name').eq('id', activeLevelId).single()
-      .then(({ data }) => { if (data) setActiveLevelName(data.name) })
+    supabase.from('levels').select('id, name, tier').eq('id', activeLevelId).single()
+      .then(({ data }) => { if (data) { setActiveLevelName(data.name); setActiveLevelTier(data.tier) } })
   }, [activeLevelId])
 
   function handleSelectLevel(levelId) {
@@ -53,11 +54,22 @@ export default function App() {
 
       <TabBar active={tab} onChange={setTab} />
 
-      {tab === 'lesson' && <LessonTab levelId={activeLevelId} isPaidAccount={isPaidAccount} />}
-      {tab === 'review' && <ReviewTab levelId={activeLevelId} />}
-      {tab === 'ear' && <EarTrainingTab levelId={activeLevelId} />}
-      {tab === 'test' && <TestTab levelId={activeLevelId} />}
-      {tab === 'practice' && <PracticeTab levelId={activeLevelId} />}
+      {/* Giữ cả 5 tab trong bộ nhớ (chỉ ẩn/hiện bằng CSS) để chuyển tab không phải tải lại dữ liệu mỗi lần */}
+      <div style={{ display: tab === 'lesson' ? 'block' : 'none' }}>
+        <LessonTab levelId={activeLevelId} isPaidAccount={isPaidAccount} />
+      </div>
+      <div style={{ display: tab === 'review' ? 'block' : 'none' }}>
+        <ReviewTab levelId={activeLevelId} />
+      </div>
+      <div style={{ display: tab === 'ear' ? 'block' : 'none' }}>
+        <EarTrainingTab levelId={activeLevelId} levelName={activeLevelName} levelTier={activeLevelTier} />
+      </div>
+      <div style={{ display: tab === 'test' ? 'block' : 'none' }}>
+        <TestTab levelId={activeLevelId} />
+      </div>
+      <div style={{ display: tab === 'practice' ? 'block' : 'none' }}>
+        <PracticeTab levelId={activeLevelId} />
+      </div>
 
       <Footer />
     </div>

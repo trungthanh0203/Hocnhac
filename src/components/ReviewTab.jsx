@@ -13,22 +13,26 @@ export default function ReviewTab({ levelId }) {
   useEffect(() => {
     async function load() {
       setLoading(true)
-      const { data: modules } = await supabase.from('modules').select('id, name').eq('level_id', levelId)
-      const moduleIds = (modules || []).map(m => m.id)
-      const moduleNameById = Object.fromEntries((modules || []).map(m => [m.id, m.name]))
+      // Gộp module + concepts vào 1 truy vấn lồng nhau, chạy SONG SONG với truy vấn questions
+      // (trước đây 3 lượt gọi tuần tự, giờ chỉ còn 1 lượt chờ mạng duy nhất)
+      const [modulesRes, questionsRes] = await Promise.all([
+        supabase.from('modules').select('id, name, concepts(*)').eq('level_id', levelId),
+        supabase.from('questions').select('*').eq('level_id', levelId),
+      ])
+      const modules = modulesRes.data || []
+      const moduleNameById = Object.fromEntries(modules.map(m => [m.id, m.name]))
+      const concepts = modules.flatMap(m => (m.concepts || []).map(c => ({ ...c, moduleName: moduleNameById[m.id] })))
+      const questions = questionsRes.data || []
 
-      const { data: concepts } = await supabase.from('concepts').select('*').in('module_id', moduleIds)
-      const { data: questions } = await supabase.from('questions').select('*').eq('level_id', levelId)
-
-      const conceptItems = (concepts || []).map(c => ({
+      const conceptItems = concepts.map(c => ({
         iconIdx: c.icon_index || 0,
-        eyebrow: moduleNameById[c.module_id] || '',
+        eyebrow: c.moduleName || '',
         term: c.term,
         sub: c.sub,
         audioNote: c.audio_note,
         staffImg: null,
       }))
-      const questionItems = (questions || []).map((q, i) => ({
+      const questionItems = questions.map((q, i) => ({
         iconIdx: i % 12,
         eyebrow: 'Ôn câu hỏi',
         term: q.question_text,

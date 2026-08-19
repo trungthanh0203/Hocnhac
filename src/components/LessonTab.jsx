@@ -1,67 +1,61 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
 import { renderMediaFullV4 as renderMediaFull } from '../lib/staffSvg.js'
 import { playAudioAction } from '../lib/audio.js'
 
-// Tab "Bài học" — chọn theo 2 bước Module -> Bài học, giống hệt kiểu chọn trong trang quản trị
+// Tab "Bài học" — chọn theo 2 bước Module -> Bài học.
+// TỐI ƯU: toàn bộ module + bài học + nội dung của 1 cấp được tải trong ĐÚNG 1 LƯỢT GỌI DUY NHẤT
+// (dùng nested select của Supabase) thay vì 3 lượt tuần tự như trước. Sau lượt tải đầu tiên,
+// đổi qua lại giữa các Module hay Bài học không cần gọi mạng nữa — dữ liệu đã có sẵn trong bộ nhớ.
 export default function LessonTab({ levelId, isPaidAccount }) {
   const [modules, setModules] = useState([])
   const [moduleId, setModuleId] = useState(null)
-  const [lessons, setLessons] = useState([])
   const [lessonIndex, setLessonIndex] = useState(0)
-  const [pointsByLesson, setPointsByLesson] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Bước 1: tải danh sách module của cấp đang xem
   useEffect(() => {
-    async function loadModules() {
+    async function load() {
       setLoading(true)
       setError(null)
-      const { data, error } = await supabase.from('modules').select('id, name, order_index').eq('level_id', levelId).order('order_index')
+      const { data, error } = await supabase
+        .from('modules')
+        .select('id, name, order_index, lessons(id, order_index, title, goal, is_demo_free, lesson_points(*))')
+        .eq('level_id', levelId)
+
       if (error) { setError(error.message); setLoading(false); return }
-      setModules(data || [])
-      setModuleId(data?.[0]?.id || null)
-    }
-    loadModules()
-  }, [levelId])
 
-  // Bước 2: khi đổi module, tải lại bài học + nội dung thuộc module đó
-  useEffect(() => {
-    if (!moduleId) return
-    async function loadLessons() {
-      setLoading(true)
-      setError(null)
-      const { data: lessonRows, error: lesErr } = await supabase
-        .from('lessons').select('id, order_index, title, goal, is_demo_free')
-        .eq('module_id', moduleId).order('order_index')
-      if (lesErr) { setError(lesErr.message); setLoading(false); return }
+      // Sắp xếp lại ở client (Supabase không đảm bảo thứ tự các bảng lồng nhau)
+      const sorted = (data || [])
+        .slice().sort((a, b) => a.order_index - b.order_index)
+        .map(m => ({
+          ...m,
+          lessons: (m.lessons || []).slice().sort((a, b) => a.order_index - b.order_index)
+            .map(l => ({ ...l, lesson_points: (l.lesson_points || []).slice().sort((a, b) => a.order_index - b.order_index) })),
+        }))
 
-      setLessons(lessonRows || [])
+      setModules(sorted)
+      setModuleId(sorted?.[0]?.id ?? null)
       setLessonIndex(0)
-
-      const lessonIds = (lessonRows || []).map(l => l.id)
-      if (lessonIds.length) {
-        const { data: pointRows, error: ptErr } = await supabase
-          .from('lesson_points').select('*').in('lesson_id', lessonIds).order('order_index')
-        if (ptErr) { setError(ptErr.message); setLoading(false); return }
-        const grouped = {}
-        pointRows.forEach(p => { if (!grouped[p.lesson_id]) grouped[p.lesson_id] = []; grouped[p.lesson_id].push(p) })
-        setPointsByLesson(grouped)
-      } else {
-        setPointsByLesson({})
-      }
       setLoading(false)
     }
-    loadLessons()
-  }, [moduleId])
+    load()
+  }, [levelId])
+
+  const currentModule = useMemo(() => modules.find(m => m.id === moduleId), [modules, moduleId])
+  const lessons = currentModule?.lessons || []
+  const lesson = lessons[lessonIndex]
+
+  function handleModuleChange(id) {
+    setModuleId(id)
+    setLessonIndex(0) // chỉ đổi state cục bộ, không gọi mạng
+  }
 
   if (loading) return <div className="loading">Đang tải…</div>
   if (error) return <div className="error-box">Lỗi tải dữ liệu: {error}</div>
   if (modules.length === 0) return <div className="loading">Chưa có nội dung nào cho cấp này.</div>
 
-  const lesson = lessons[lessonIndex]
-  const points = lesson ? (pointsByLesson[lesson.id] || []) : []
+  const points = lesson?.lesson_points || []
   const locked = lesson ? (!isPaidAccount && !lesson.is_demo_free) : false
 
   return (
@@ -69,7 +63,7 @@ export default function LessonTab({ levelId, isPaidAccount }) {
       <div className="select-row">
         <div className="select-field narrow">
           <label>Module</label>
-          <select value={moduleId || ''} onChange={e => setModuleId(Number(e.target.value))}>
+          <select value={moduleId || ''} onChange={e => handleModuleChange(Number(e.target.value))}>
             {modules.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
         </div>
@@ -86,7 +80,7 @@ export default function LessonTab({ levelId, isPaidAccount }) {
       {lesson && (
         <>
           <div className="lesson-box">
-            <div className="lesson-eyebrow">{modules.find(m => m.id === moduleId)?.name}</div>
+            <div className="lesson-eyebrow">{currentModule?.name}</div>
             <div className="lesson-title">{lesson.title}</div>
             {lesson.goal && <div className="lesson-goal">🎯 Mục tiêu: {lesson.goal}</div>}
 
