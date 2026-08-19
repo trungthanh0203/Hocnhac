@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
 
+const MODULE_NAMES = ['Nhạc lý', 'Tiết tấu', 'Xướng âm', 'Hòa âm', 'Thường thức']
+
 export default function StudentsAdmin() {
   const [students, setStudents] = useState([])
   const [levels, setLevels] = useState([])
@@ -19,9 +21,12 @@ export default function StudentsAdmin() {
 
   function accessOf(userId) {
     const rows = access.filter(a => a.user_id === userId)
-    const hasAll = rows.some(r => r.level_id === null)
-    const levelIds = rows.filter(r => r.level_id !== null).map(r => r.level_id)
-    return { hasAll, levelIds }
+    const levelRows = rows.filter(r => !r.module_name)
+    const moduleRows = rows.filter(r => r.module_name)
+    const hasAll = levelRows.some(r => r.level_id === null)
+    const levelIds = levelRows.filter(r => r.level_id !== null).map(r => r.level_id)
+    const moduleNames = moduleRows.map(r => r.module_name)
+    return { hasAll, levelIds, moduleNames }
   }
   function codesOf(userId) {
     return codes.filter(c => c.used_by === userId)
@@ -32,17 +37,25 @@ export default function StudentsAdmin() {
       const { error } = await supabase.from('student_access').insert({ user_id: userId, level_id: null })
       if (error) return setMsg({ type: 'error', text: error.message })
     } else {
-      await supabase.from('student_access').delete().eq('user_id', userId).is('level_id', null)
+      await supabase.from('student_access').delete().eq('user_id', userId).is('level_id', null).is('module_name', null)
     }
     reload()
   }
-
   async function toggleLevel(userId, levelId, checked) {
     if (checked) {
       const { error } = await supabase.from('student_access').insert({ user_id: userId, level_id: levelId })
       if (error) return setMsg({ type: 'error', text: error.message })
     } else {
-      await supabase.from('student_access').delete().eq('user_id', userId).eq('level_id', levelId)
+      await supabase.from('student_access').delete().eq('user_id', userId).eq('level_id', levelId).is('module_name', null)
+    }
+    reload()
+  }
+  async function toggleModule(userId, moduleName, checked) {
+    if (checked) {
+      const { error } = await supabase.from('student_access').insert({ user_id: userId, level_id: null, module_name: moduleName })
+      if (error) return setMsg({ type: 'error', text: error.message })
+    } else {
+      await supabase.from('student_access').delete().eq('user_id', userId).eq('module_name', moduleName)
     }
     reload()
   }
@@ -60,11 +73,13 @@ export default function StudentsAdmin() {
       {msg && <div className={'admin-msg ' + msg.type}>{msg.text}</div>}
 
       <table className="admin-table">
-        <thead><tr><th>Email</th><th>Ngày đăng ký</th><th>Các cấp đã mở</th><th></th></tr></thead>
+        <thead><tr><th>Email</th><th>Ngày đăng ký</th><th>Quyền đang có</th><th></th></tr></thead>
         <tbody>
           {students.map(s => {
             const acc = accessOf(s.id)
-            const summary = acc.hasAll ? 'Tất cả 9 cấp' : (levels.filter(l => acc.levelIds.includes(l.id)).map(l => l.name).join(', ') || 'Chưa mở cấp nào')
+            const levelSummary = acc.hasAll ? 'Tất cả 9 cấp' : levels.filter(l => acc.levelIds.includes(l.id)).map(l => l.name).join(', ')
+            const moduleSummary = acc.moduleNames.join(', ')
+            const summary = [levelSummary, moduleSummary].filter(Boolean).join(' · ') || 'Chưa mở gì'
             const isOpen = expanded === s.id
             return (
               <Fragment key={s.id}>
@@ -82,6 +97,7 @@ export default function StudentsAdmin() {
                   <tr key={s.id + '-detail'}>
                     <td colSpan={4} style={{ background: 'var(--bg)' }}>
                       <div style={{ padding: '12px 8px' }}>
+                        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 6 }}>Quyền theo cấp</div>
                         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, marginBottom: 10 }}>
                           <input type="checkbox" checked={acc.hasAll} onChange={e => toggleAll(s.id, e.target.checked)} />
                           Mở tất cả 9 cấp
@@ -96,6 +112,16 @@ export default function StudentsAdmin() {
                             ))}
                           </div>
                         )}
+
+                        <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 6 }}>Quyền theo module</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 14px', marginBottom: 14 }}>
+                          {MODULE_NAMES.map(name => (
+                            <label key={name} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5 }}>
+                              <input type="checkbox" checked={acc.moduleNames.includes(name)} onChange={e => toggleModule(s.id, name, e.target.checked)} />
+                              {name}
+                            </label>
+                          ))}
+                        </div>
 
                         <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 6 }}>Mã đã nhập</div>
                         {codesOf(s.id).length === 0 && <div style={{ fontSize: 12.5, color: 'var(--muted)' }}>Học viên này chưa nhập mã nào (quyền có thể do admin cấp trực tiếp ở trên).</div>}

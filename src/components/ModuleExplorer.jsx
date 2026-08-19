@@ -5,9 +5,8 @@ import LessonContent from './LessonContent.jsx'
 const MODULE_NAMES = ['Nhạc lý', 'Tiết tấu', 'Xướng âm', 'Hòa âm', 'Thường thức']
 
 // Chế độ "Học theo module": nối toàn bộ bài học của 1 module XUYÊN SUỐT cả 9 cấp
-// thành 1 chuỗi bài liên tục theo đúng thứ tự tăng dần độ khó — dành cho người học
-// chỉ muốn tập trung luyện 1 kỹ năng (ví dụ chỉ Xướng âm) mà không phải nhảy qua từng cấp.
-// Toàn bộ dữ liệu tải trong 1 lượt gọi duy nhất (giống cách đã tối ưu ở tab Bài học).
+// thành 1 chuỗi bài liên tục theo đúng thứ tự tăng dần độ khó. Giao diện chọn theo
+// đúng kiểu 2 dropdown như tab "Bài học" (Module -> Bài học) cho quen mắt, gọn hơn dãy chip.
 export default function ModuleExplorer({ auth }) {
   const [moduleName, setModuleName] = useState('Xướng âm')
   const [levels, setLevels] = useState([])
@@ -54,35 +53,55 @@ export default function ModuleExplorer({ auth }) {
   useEffect(() => { setIndex(0) }, [moduleName])
 
   if (loading) return <div className="loading">Đang tải…</div>
-  if (timeline.length === 0) return <div className="loading">Chưa có nội dung cho module này.</div>
 
   const item = timeline[index]
-  const isPaidForThisLevel = auth.isLevelUnlocked(item.levelId)
-  const locked = !isPaidForThisLevel && !item.lesson.is_demo_free
+  const isPaidForThisLevel = item ? auth.isLevelUnlocked(item.levelId) : false
+  const isPaidForThisModule = auth.isModuleUnlocked(moduleName)
+  const locked = item ? (!isPaidForThisLevel && !isPaidForThisModule && !item.lesson.is_demo_free) : false
 
   return (
     <div className="panel">
       <div className="lesson-eyebrow" style={{ marginBottom: 8 }}>Học theo module · xuyên suốt cả 9 cấp</div>
-      <div className="chip-row">
-        {MODULE_NAMES.map(name => (
-          <div key={name} className={'chip' + (moduleName === name ? ' active' : '')} onClick={() => setModuleName(name)}>
-            {name}
+
+      <div className="select-row">
+        <div className="select-field narrow">
+          <label>Module</label>
+          <select value={moduleName} onChange={e => setModuleName(e.target.value)}>
+            {MODULE_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </div>
+        <div className="select-field wide">
+          <label>Bài học</label>
+          <select value={timeline.length ? index : ''} onChange={e => setIndex(Number(e.target.value))} disabled={timeline.length === 0}>
+            {timeline.length === 0
+              ? <option>— chưa có bài —</option>
+              : timeline.map((it, i) => (
+                <option key={`${it.levelId}-${it.lesson.id}`} value={i}>
+                  {it.levelName} · Bài {i + 1}: {it.lesson.title}
+                </option>
+              ))}
+          </select>
+        </div>
+      </div>
+
+      {timeline.length === 0 ? (
+        <div className="loading">Chưa có nội dung cho module này.</div>
+      ) : (
+        <>
+          <LessonContent
+            lesson={item.lesson}
+            points={item.lesson.lesson_points}
+            locked={locked}
+            eyebrow={`${item.levelName} · ${moduleName}`}
+          />
+
+          <div className="lesson-nav">
+            <button className="nav-btn" disabled={index === 0} onClick={() => setIndex(i => i - 1)}>← Trước</button>
+            <span className="progress">{index + 1} / {timeline.length}</span>
+            <button className="nav-btn" disabled={index === timeline.length - 1} onClick={() => setIndex(i => i + 1)}>Sau →</button>
           </div>
-        ))}
-      </div>
-
-      <LessonContent
-        lesson={item.lesson}
-        points={item.lesson.lesson_points}
-        locked={locked}
-        eyebrow={`${item.levelName} · ${moduleName}`}
-      />
-
-      <div className="lesson-nav">
-        <button className="nav-btn" disabled={index === 0} onClick={() => setIndex(i => i - 1)}>← Trước</button>
-        <span className="progress">{index + 1} / {timeline.length}</span>
-        <button className="nav-btn" disabled={index === timeline.length - 1} onClick={() => setIndex(i => i + 1)}>Sau →</button>
-      </div>
+        </>
+      )}
     </div>
   )
 }

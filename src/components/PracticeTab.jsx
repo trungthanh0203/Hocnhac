@@ -41,7 +41,7 @@ function renderScoreRow(measures, highlightGid) {
   return `<svg viewBox="0 0 ${totalW} 108" width="100%" style="display:block;margin-bottom:10px">${staffLines}${clef}${els}</svg>`
 }
 
-export default function PracticeTab({ levelId }) {
+export default function PracticeTab({ levelId, allLevels }) {
   const [scores, setScores] = useState([])
   const [activeIdx, setActiveIdx] = useState(0)
   const [highlightGid, setHighlightGid] = useState(-1)
@@ -49,13 +49,15 @@ export default function PracticeTab({ levelId }) {
 
   useEffect(() => {
     setLoading(true)
-    supabase.from('practice_scores').select('*').eq('level_id', levelId).order('order_index').then(({ data }) => {
+    const query = supabase.from('practice_scores').select('*, levels(name)').order('order_index')
+    const scoped = allLevels ? query : query.eq('level_id', levelId)
+    scoped.then(({ data }) => {
       setScores(data || [])
       setActiveIdx(0)
       setHighlightGid(-1)
       setLoading(false)
     })
-  }, [levelId])
+  }, [levelId, allLevels])
 
   const current = scores[activeIdx]
   const { measuresGid, flatNotes } = useMemo(
@@ -76,11 +78,11 @@ export default function PracticeTab({ levelId }) {
 
   return (
     <div className="panel">
-      <div className="lesson-eyebrow" style={{ marginBottom: 8 }}>Thực hành · chọn 1 trong {scores.length} giai điệu</div>
+      <div className="lesson-eyebrow" style={{ marginBottom: 8 }}>Thực hành · chọn 1 trong {scores.length} giai điệu{allLevels ? ' · toàn bộ 9 cấp' : ''}</div>
       <div className="chip-row">
         {scores.map((s, i) => (
           <div key={s.id} className={'chip' + (activeIdx === i ? ' active' : '')} onClick={() => { setActiveIdx(i); setHighlightGid(-1) }}>
-            {s.title}
+            {allLevels && s.levels?.name ? `${s.levels.name} · ${s.title}` : s.title}
           </div>
         ))}
       </div>

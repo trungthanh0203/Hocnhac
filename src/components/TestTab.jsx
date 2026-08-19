@@ -7,7 +7,7 @@ const TYPE_LABEL = { mc: 'Trắc nghiệm khái niệm', staff: 'Nhìn khuông n
 
 function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5) }
 
-export default function TestTab({ levelId }) {
+export default function TestTab({ levelId, allLevels }) {
   const [bank, setBank] = useState([])
   const [questions, setQuestions] = useState([])
   const [answers, setAnswers] = useState({})
@@ -15,11 +15,13 @@ export default function TestTab({ levelId }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase.from('questions').select('*').eq('level_id', levelId).then(({ data }) => {
+    const query = supabase.from('questions').select('*')
+    const scoped = allLevels ? query : query.eq('level_id', levelId)
+    scoped.then(({ data }) => {
       setBank(data || [])
       setLoading(false)
     })
-  }, [levelId])
+  }, [levelId, allLevels])
 
   useEffect(() => { if (bank.length) startNewTest() }, [bank])
 
@@ -55,7 +57,7 @@ export default function TestTab({ levelId }) {
 
   return (
     <div className="panel">
-      <div className="lesson-eyebrow" style={{ marginBottom: 10 }}>Bài test · 6 câu ngẫu nhiên</div>
+      <div className="lesson-eyebrow" style={{ marginBottom: 10 }}>Bài test · 6 câu ngẫu nhiên{allLevels ? ' · lấy từ toàn bộ 9 cấp' : ''}</div>
 
       {questions.map((q, i) => {
         const correct = checked && isCorrect(q, i)
