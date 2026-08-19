@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xem trước giao diện mới</title>
+<title>Xem trước giao diện Đen-Đỏ-Vàng</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy:#1b2b65; --navy2:#3454d1; --gold:#ffb627; --gold-soft:#fff2d6;
+  --navy:#1a1614; --navy2:#7a1620; --gold:#e8a933; --gold-soft:#fff2d6;
   --coral:#ff6f59; --coral-soft:#ffe4df; --mint:#2ec4b6; --mint-soft:#dff7f4;
   --milk:#fff6e2; --milk2:#f8dfa3;
   --ink:#1c2333; --muted:#6b7280; --line:#ece6d8; --bg:#fff8ec;
   --green:#16a34a; --red:#ef4444;
-  --shadow-sm:0 2px 8px rgba(27,43,101,.07);
-  --shadow-md:0 6px 20px rgba(27,43,101,.12);
+  --shadow-sm:0 2px 8px rgba(26,22,20,.1);
+  --shadow-md:0 6px 20px rgba(26,22,20,.16);
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html{scroll-behavior:smooth;}
@@ -23,7 +23,7 @@ body{
   font-family:'Nunito', 'Segoe UI', system-ui, sans-serif; color:var(--ink);
   background:
     radial-gradient(circle at 15% 8%, #ffe9c2 0%, transparent 45%),
-    radial-gradient(circle at 88% 92%, #d7ecff 0%, transparent 40%),
+    radial-gradient(circle at 88% 92%, #ffe4c4 0%, transparent 40%),
     var(--bg);
   min-height:100vh;
 }
@@ -38,29 +38,31 @@ h1, h2, .lesson-title, .banner h1, .roadmap-name, .footer-title{
 
 .banner{
   position:relative; overflow:hidden;
-  background:linear-gradient(135deg, var(--milk) 0%, var(--milk2) 100%);
-  color:var(--navy); padding:26px 20px 22px;
+  background:linear-gradient(120deg, #000000 0%, var(--navy) 35%, var(--navy2) 100%);
+  color:#fff; padding:26px 20px 24px;
+  border-bottom:4px solid transparent;
+  border-image:linear-gradient(90deg, #000000, var(--navy2), var(--gold)) 1;
 }
 /* Chi tiết đặc trưng "khuông nhạc" mờ trên banner — dấu ấn riêng của app học nhạc */
 .banner::before{
-  content:''; position:absolute; inset:0; pointer-events:none; opacity:.22;
+  content:''; position:absolute; inset:0; pointer-events:none; opacity:.16;
   background-image:repeating-linear-gradient(
-    to bottom, transparent 0, transparent 13px, rgba(27,43,101,.4) 13px, rgba(27,43,101,.4) 14px
+    to bottom, transparent 0, transparent 13px, rgba(255,255,255,.9) 13px, rgba(255,255,255,.9) 14px
   );
   background-size:100% 70px; background-position:0 -6px;
   mask-image:linear-gradient(to bottom, black, transparent 92%);
 }
 .banner::after{
   content:'♪'; position:absolute; right:-6px; top:-14px; font-size:110px;
-  color:rgba(27,43,101,.09); pointer-events:none; font-family:serif; line-height:1;
+  color:rgba(255,255,255,.08); pointer-events:none; font-family:serif; line-height:1;
 }
 .banner > *{ position:relative; z-index:1; }
-.banner h1{font-size:21px; font-weight:700; letter-spacing:.01em; color:var(--navy);}
-.banner p{font-size:12.5px; color:var(--navy); opacity:.75; margin-top:4px;}
+.banner h1{font-size:21px; font-weight:700; letter-spacing:.01em; color:#fff;}
+.banner p{font-size:12.5px; color:#fff; opacity:.85; margin-top:4px;}
 .banner-row{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:14px;}
 .badge{
-  display:inline-block; font-size:11px; background:linear-gradient(135deg, var(--navy), var(--navy2));
-  color:#fff; font-weight:700; padding:5px 12px; border-radius:20px; box-shadow:0 2px 6px rgba(27,43,101,.25);
+  display:inline-block; font-size:11px; background:linear-gradient(135deg, var(--gold), #f5c968);
+  color:var(--navy); font-weight:700; padding:5px 12px; border-radius:20px; box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
 
 .tabs{display:flex; gap:6px; padding:14px 14px 4px; flex-wrap:wrap;}
@@ -88,8 +90,8 @@ h1, h2, .lesson-title, .banner h1, .roadmap-name, .footer-title{
 .lock{margin-top:14px; padding:10px 14px; font-size:12px; color:#8a5a06; background:var(--gold-soft); border-radius:12px; text-align:center; font-weight:600;}
 .loading, .error-box{padding:24px; text-align:center; color:var(--muted); font-size:13px;}
 
-.roadmap-btn{flex:none; background:rgba(27,43,101,.08); color:var(--navy); border:1px solid rgba(27,43,101,.25); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .15s ease;}
-.roadmap-btn:active{background:rgba(27,43,101,.18);}
+.roadmap-btn{flex:none; background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.35); border-radius:20px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .15s ease;}
+.roadmap-btn:active{background:rgba(255,255,255,.28);}
 .roadmap-panel{background:var(--bg); border-bottom:1.5px solid var(--line);}
 .roadmap-tier{margin-bottom:18px;}
 .roadmap-tier-title{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; padding-left:2px;}
@@ -141,11 +143,11 @@ h1, h2, .lesson-title, .banner h1, .roadmap-name, .footer-title{
 .quiz-feedback.correct{color:var(--green);}
 .quiz-feedback.incorrect{color:var(--red);}
 
-.footer{background:linear-gradient(135deg, var(--milk), var(--milk2)); color:var(--navy); padding:24px 20px; text-align:center;}
-.footer-title{font-size:15px; font-weight:800; color:var(--navy); margin-bottom:4px;}
-.footer-sub{font-size:12px; color:var(--navy); opacity:.75; margin-bottom:14px; line-height:1.5;}
+.footer{background:linear-gradient(120deg, #000000 0%, var(--navy) 45%, var(--navy2) 100%); color:#fff; padding:24px 20px; text-align:center; border-top:4px solid transparent; border-image:linear-gradient(90deg, var(--gold), var(--navy2), #000000) 1;}
+.footer-title{font-size:15px; font-weight:800; color:var(--gold); margin-bottom:4px;}
+.footer-sub{font-size:12px; color:#fff; opacity:.85; margin-bottom:14px; line-height:1.5;}
 .footer-links{display:flex; flex-direction:column; gap:8px;}
-.footer-chip{background:rgba(27,43,101,.08); color:var(--navy); border:1px solid rgba(27,43,101,.15); border-radius:20px; padding:9px 14px; font-size:12.5px; font-weight:600;}
+.footer-chip{background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.18); border-radius:20px; padding:9px 14px; font-size:12.5px; font-weight:600;}
 
 /* 2 dropdown chọn Module -> Bài học, kiểu giống trang quản trị */
 .select-row{display:flex; gap:10px; margin-bottom:14px;}
