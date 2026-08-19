@@ -6,6 +6,11 @@ const freq = { C: 261.63, D: 293.66, E: 329.63, F: 349.23, G: 392.0, A: 440.0, B
 let actx
 function ac() {
   if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)()
+  // Bắt buộc trên Safari/iOS: AudioContext luôn khởi động ở trạng thái "suspended",
+  // phải gọi resume() (ngay trong lượt bấm của người dùng) thì mới thực sự phát được âm thanh.
+  if (actx.state === 'suspended') {
+    actx.resume()
+  }
   return actx
 }
 
