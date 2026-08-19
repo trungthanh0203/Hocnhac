@@ -10,10 +10,12 @@ import ReviewTab from './components/ReviewTab.jsx'
 import EarTrainingTab from './components/EarTrainingTab.jsx'
 import TestTab from './components/TestTab.jsx'
 import PracticeTab from './components/PracticeTab.jsx'
+import ModuleExplorer from './components/ModuleExplorer.jsx'
 import { useAuth } from './hooks/useAuth.js'
 
 export default function App() {
   const [tab, setTab] = useState('lesson')
+  const [learnMode, setLearnMode] = useState('level') // 'level' | 'module'
   const [authOpen, setAuthOpen] = useState(false)
   const [roadmapOpen, setRoadmapOpen] = useState(false)
   const [activeLevelId, setActiveLevelId] = useState(1) // Sơ cấp 1 làm mặc định khi mở app
@@ -54,24 +56,35 @@ export default function App() {
       <RoadmapPanel auth={auth} currentLevelId={activeLevelId} open={roadmapOpen} onSelectLevel={handleSelectLevel} />
       <AuthPanel auth={auth} open={authOpen} onClose={() => setAuthOpen(false)} />
 
-      <TabBar active={tab} onChange={setTab} />
+      <div className="chip-row" style={{ padding: '14px 16px 0' }}>
+        <div className={'chip' + (learnMode === 'level' ? ' active' : '')} onClick={() => setLearnMode('level')}>Học theo cấp</div>
+        <div className={'chip' + (learnMode === 'module' ? ' active' : '')} onClick={() => setLearnMode('module')}>Học theo module</div>
+      </div>
 
-      {/* Giữ cả 5 tab trong bộ nhớ (chỉ ẩn/hiện bằng CSS) để chuyển tab không phải tải lại dữ liệu mỗi lần */}
-      <div style={{ display: tab === 'lesson' ? 'block' : 'none' }}>
-        <LessonTab levelId={activeLevelId} isPaidAccount={isPaidAccount} />
-      </div>
-      <div style={{ display: tab === 'review' ? 'block' : 'none' }}>
-        <ReviewTab levelId={activeLevelId} />
-      </div>
-      <div style={{ display: tab === 'ear' ? 'block' : 'none' }}>
-        <EarTrainingTab levelId={activeLevelId} levelName={activeLevelName} levelTier={activeLevelTier} />
-      </div>
-      <div style={{ display: tab === 'test' ? 'block' : 'none' }}>
-        <TestTab levelId={activeLevelId} />
-      </div>
-      <div style={{ display: tab === 'practice' ? 'block' : 'none' }}>
-        <PracticeTab levelId={activeLevelId} />
-      </div>
+      {learnMode === 'module' ? (
+        <ModuleExplorer auth={auth} />
+      ) : (
+        <>
+          <TabBar active={tab} onChange={setTab} />
+
+          {/* Giữ cả 5 tab trong bộ nhớ (chỉ ẩn/hiện bằng CSS) để chuyển tab không phải tải lại dữ liệu mỗi lần */}
+          <div style={{ display: tab === 'lesson' ? 'block' : 'none' }}>
+            <LessonTab levelId={activeLevelId} isPaidAccount={isPaidAccount} />
+          </div>
+          <div style={{ display: tab === 'review' ? 'block' : 'none' }}>
+            <ReviewTab levelId={activeLevelId} />
+          </div>
+          <div style={{ display: tab === 'ear' ? 'block' : 'none' }}>
+            <EarTrainingTab levelId={activeLevelId} levelName={activeLevelName} levelTier={activeLevelTier} />
+          </div>
+          <div style={{ display: tab === 'test' ? 'block' : 'none' }}>
+            <TestTab levelId={activeLevelId} />
+          </div>
+          <div style={{ display: tab === 'practice' ? 'block' : 'none' }}>
+            <PracticeTab levelId={activeLevelId} />
+          </div>
+        </>
+      )}
 
       <Footer />
     </div>

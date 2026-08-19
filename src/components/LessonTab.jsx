@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../supabaseClient.js'
-import { renderMediaFullV4 as renderMediaFull } from '../lib/staffSvg.js'
-import { playAudioAction } from '../lib/audio.js'
+import LessonContent from './LessonContent.jsx'
 
 // Tab "Bài học" — chọn theo 2 bước Module -> Bài học.
 // TỐI ƯU: toàn bộ module + bài học + nội dung của 1 cấp được tải trong ĐÚNG 1 LƯỢT GỌI DUY NHẤT
@@ -79,36 +78,13 @@ export default function LessonTab({ levelId, isPaidAccount }) {
 
       {lesson && (
         <>
-          <div className="lesson-box">
-            <div className="lesson-eyebrow">{currentModule?.name}</div>
-            <div className="lesson-title">{lesson.title}</div>
-            {lesson.goal && <div className="lesson-goal">🎯 Mục tiêu: {lesson.goal}</div>}
-
-            {points.map((p, i) => (
-              <div className="point" key={p.id}>
-                <div className="num">{i + 1}</div>
-                <div className="point-body">
-                  <h4>{p.heading}</h4>
-                  <p>{p.body}</p>
-                  {p.media && <div className="point-img" dangerouslySetInnerHTML={{ __html: renderMediaFull(p.media) }} />}
-                  {p.audio && (
-                    <span className="mini-play" onClick={() => playAudioAction(p.audio)}>
-                      🔊 {p.audio.label}
-                    </span>
-                  )}
-                  {p.example_tag && <div className="example-tag">🎵 {p.example_tag}</div>}
-                </div>
-              </div>
-            ))}
-          </div>
+          <LessonContent lesson={lesson} points={points} locked={locked} eyebrow={currentModule?.name} />
 
           <div className="lesson-nav">
             <button className="nav-btn" disabled={lessonIndex === 0} onClick={() => setLessonIndex(i => i - 1)}>← Trước</button>
             <span className="progress">Bài {lessonIndex + 1} / {lessons.length}</span>
             <button className="nav-btn" disabled={lessonIndex === lessons.length - 1} onClick={() => setLessonIndex(i => i + 1)}>Sau →</button>
           </div>
-
-          {locked && <div className="lock">Bài này cần nâng cấp tài khoản để mở khóa</div>}
         </>
       )}
     </div>
