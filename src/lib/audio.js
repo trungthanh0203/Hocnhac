@@ -14,6 +14,23 @@ function ac() {
   return actx
 }
 
+// "Mở khóa" âm thanh triệt để cho iOS: phát 1 khoảng im lặng cực ngắn ngay ở lượt
+// chạm/bấm ĐẦU TIÊN của người dùng trên toàn app (gọi 1 lần từ main.jsx), trước khi
+// họ kịp bấm bất kỳ nút loa nào. Đây là kỹ thuật chuẩn để xử lý dứt điểm lỗi Safari/iOS
+// im lặng dù đã gọi resume().
+export function primeAudio() {
+  const c = ac()
+  try {
+    const buffer = c.createBuffer(1, 1, 22050)
+    const src = c.createBufferSource()
+    src.buffer = buffer
+    src.connect(c.destination)
+    src.start(0)
+  } catch (e) {
+    // im lặng bỏ qua nếu trình duyệt không cho phép — không ảnh hưởng các lần phát sau
+  }
+}
+
 export function playNote(note, dur = 0.9, delay = 0, type = 'triangle') {
   const c = ac()
   const t0 = c.currentTime + delay

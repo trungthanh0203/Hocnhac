@@ -1,7 +1,7 @@
 // Service Worker tối giản — cache kiểu "stale-while-revalidate" cho tài nguyên cùng gốc
 // (HTML/JS/CSS/ảnh của chính app). KHÔNG cache các lượt gọi tới Supabase (khác gốc),
 // để dữ liệu bài học/điểm số luôn lấy mới nhất, không bị "đứng" dữ liệu cũ.
-const CACHE_NAME = 'hocnhac-cache-v1'
+const CACHE_NAME = 'hocnhac-cache-v2'
 
 self.addEventListener('install', () => {
   self.skipWaiting()
