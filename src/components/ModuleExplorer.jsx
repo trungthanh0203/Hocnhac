@@ -14,12 +14,12 @@ export default function ModuleExplorer({ auth }) {
   const [index, setIndex] = useState(0)
 
   // Tài khoản đã mua THEO MODULE -> chỉ hiện đúng (những) module đã mua trong dropdown.
-  // Tài khoản demo hoặc mua theo cấp (đang bấm sang xem thử) -> vẫn hiện đủ 5 module để khám phá.
+  // Tài khoản demo/chưa đăng nhập -> chỉ cho xem thử đúng module ĐẦU TIÊN, không hiện cả 5.
   const availableModules = useMemo(() => {
     if (auth.accountMode === 'module' && auth.unlockedModuleNames.length > 0) {
       return MODULE_NAMES.filter(n => auth.unlockedModuleNames.includes(n))
     }
-    return MODULE_NAMES
+    return [MODULE_NAMES[0]]
   }, [auth.accountMode, auth.unlockedModuleNames])
 
   useEffect(() => {
@@ -72,7 +72,12 @@ export default function ModuleExplorer({ auth }) {
   const item = timeline[index]
   const isPaidForThisLevel = item ? auth.isLevelUnlocked(item.levelId) : false
   const isPaidForThisModule = auth.isModuleUnlocked(moduleName)
-  const locked = item ? (!isPaidForThisLevel && !isPaidForThisModule && !item.lesson.is_demo_free) : false
+  const isDemo = auth.accountMode === 'demo'
+  // Demo: chỉ 3 bài đầu tiên trong CẢ CHUỖI được mở, không xét cờ is_demo_free của từng bài
+  // (cờ đó chỉ có ý nghĩa trong phạm vi 1 cấp ở chế độ "Học theo cấp", không áp dụng ở đây).
+  const locked = item
+    ? (isDemo ? index >= 3 : (!isPaidForThisLevel && !isPaidForThisModule && !item.lesson.is_demo_free))
+    : false
 
   return (
     <div className="panel">

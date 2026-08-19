@@ -18,7 +18,7 @@ export default function ModuleReviewTab({ auth }) {
     if (auth.accountMode === 'module' && auth.unlockedModuleNames.length > 0) {
       return MODULE_NAMES.filter(n => auth.unlockedModuleNames.includes(n))
     }
-    return MODULE_NAMES
+    return [MODULE_NAMES[0]]
   }, [auth.accountMode, auth.unlockedModuleNames])
 
   useEffect(() => {
