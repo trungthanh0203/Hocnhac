@@ -2,15 +2,18 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import AdminApp from './AdminApp.jsx'
+import ResetPasswordPage from './ResetPasswordPage.jsx'
 import { primeAudio } from './lib/audio.js'
 import './index.css'
 import './admin/admin.css'
 
-const isAdmin = window.location.pathname.startsWith('/admin')
+const path = window.location.pathname
+const isAdmin = path.startsWith('/admin')
+const isResetPassword = path.startsWith('/reset-password')
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {isAdmin ? <AdminApp /> : <App />}
+    {isAdmin ? <AdminApp /> : isResetPassword ? <ResetPasswordPage /> : <App />}
   </React.StrictMode>
 )
 

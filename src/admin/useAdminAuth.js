@@ -2,17 +2,17 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient.js'
 
 // Hook đăng nhập riêng cho trang quản trị: sau khi đăng nhập, kiểm tra
-// profiles.role có phải 'admin' không — nếu không thì coi như chưa đăng nhập
-// (không cho vào trang quản trị dù đăng nhập Supabase thành công).
+// profiles.role có phải 'admin' hoặc 'super_admin' không — nếu không thì coi
+// như chưa đăng nhập (không cho vào trang quản trị dù đăng nhập Supabase thành công).
 export function useAdminAuth() {
   const [user, setUser] = useState(null)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [role, setRole] = useState(null) // 'student' | 'admin' | 'super_admin' | null
   const [loading, setLoading] = useState(true)
 
   const checkRole = useCallback(async (userId) => {
-    if (!userId) { setIsAdmin(false); return }
+    if (!userId) { setRole(null); return }
     const { data } = await supabase.from('profiles').select('role').eq('id', userId).single()
-    setIsAdmin(data?.role === 'admin')
+    setRole(data?.role || null)
   }, [])
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function useAdminAuth() {
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user || null)
       if (session?.user) await checkRole(session.user.id)
-      else setIsAdmin(false)
+      else setRole(null)
     })
     return () => sub.subscription.unsubscribe()
   }, [checkRole])
@@ -37,5 +37,8 @@ export function useAdminAuth() {
     await supabase.auth.signOut()
   }
 
-  return { user, isAdmin, loading, signIn, signOut }
+  const isAdmin = role === 'admin' || role === 'super_admin'
+  const isSuperAdmin = role === 'super_admin'
+
+  return { user, role, isAdmin, isSuperAdmin, loading, signIn, signOut }
 }

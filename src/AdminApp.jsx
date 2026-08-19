@@ -6,6 +6,7 @@ import QuestionsAdmin from './admin/QuestionsAdmin.jsx'
 import CodesAdmin from './admin/CodesAdmin.jsx'
 import StudentsAdmin from './admin/StudentsAdmin.jsx'
 import PracticeAdmin from './admin/PracticeAdmin.jsx'
+import AdminsAdmin from './admin/AdminsAdmin.jsx'
 
 const TABS = [
   { key: 'lessons', label: 'Bài học', Comp: LessonsAdmin },
@@ -13,6 +14,7 @@ const TABS = [
   { key: 'codes', label: 'Mã kích hoạt', Comp: CodesAdmin },
   { key: 'students', label: 'Học viên', Comp: StudentsAdmin },
   { key: 'practice', label: 'Giai điệu', Comp: PracticeAdmin },
+  { key: 'admins', label: 'Quản trị viên', Comp: AdminsAdmin },
 ]
 
 export default function AdminApp() {
@@ -29,7 +31,7 @@ export default function AdminApp() {
       <div className="admin-header">
         <h1>Quản trị · Học nhạc cùng Mr.Thành</h1>
         <div className="who">
-          {auth.user.email} &nbsp;
+          {auth.user.email} · {auth.isSuperAdmin ? 'Super Admin' : 'Admin'} &nbsp;
           <button className="admin-btn secondary" onClick={auth.signOut}>Đăng xuất</button>
         </div>
       </div>
@@ -40,7 +42,7 @@ export default function AdminApp() {
           </div>
         ))}
       </div>
-      <Active />
+      <Active isSuperAdmin={auth.isSuperAdmin} />
     </div>
   )
 }

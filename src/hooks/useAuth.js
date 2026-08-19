@@ -63,6 +63,17 @@ export function useAuth() {
     return unlockedModuleNames.includes(moduleName)
   }
 
+  async function resetPasswordForEmail(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password',
+    })
+    return error
+  }
+  async function updatePassword(newPassword) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    return error
+  }
+
   // 'level'  = tài khoản đã mua ít nhất 1 cấp -> khóa cứng giao diện "Học theo cấp"
   // 'module' = chỉ có quyền theo module (chưa mua cấp nào) -> khóa cứng "Học theo module"
   // 'demo'   = chưa đăng nhập hoặc đăng nhập nhưng chưa mua gì -> vẫn cho chuyển đổi 2 kiểu
@@ -73,6 +84,6 @@ export function useAuth() {
   return {
     user, loadingAuth, unlockedLevelIds, unlockedModuleNames, accountMode,
     isLevelUnlocked, isModuleUnlocked,
-    signUp, signIn, signOut, redeemCode,
+    signUp, signIn, signOut, redeemCode, resetPasswordForEmail, updatePassword,
   }
 }
