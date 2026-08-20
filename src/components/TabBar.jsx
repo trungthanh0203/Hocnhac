@@ -1,9 +1,9 @@
 const TABS = [
   { key: 'lesson', label: 'Bài học' },
   { key: 'review', label: 'Ôn tập' },
-  { key: 'ear', label: 'Luyện âm' },
   { key: 'test', label: 'Bài test' },
   { key: 'practice', label: 'Thực hành' },
+  { key: 'ear', label: 'Luyện âm' },
 ]
 
 export default function TabBar({ active, onChange }) {

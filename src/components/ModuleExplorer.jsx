@@ -14,12 +14,12 @@ export default function ModuleExplorer({ auth }) {
   const [index, setIndex] = useState(0)
 
   // Tài khoản đã mua THEO MODULE -> chỉ hiện đúng (những) module đã mua trong dropdown.
-  // Tài khoản demo/chưa đăng nhập -> chỉ cho xem thử đúng module ĐẦU TIÊN, không hiện cả 5.
+  // Tài khoản demo/chưa đăng nhập -> vẫn hiện đủ 5 module để chọn (chỉ giới hạn ở dropdown Bài học).
   const availableModules = useMemo(() => {
     if (auth.accountMode === 'module' && auth.unlockedModuleNames.length > 0) {
       return MODULE_NAMES.filter(n => auth.unlockedModuleNames.includes(n))
     }
-    return [MODULE_NAMES[0]]
+    return MODULE_NAMES
   }, [auth.accountMode, auth.unlockedModuleNames])
 
   useEffect(() => {
