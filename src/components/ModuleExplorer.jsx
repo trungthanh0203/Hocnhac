@@ -69,14 +69,16 @@ export default function ModuleExplorer({ auth }) {
 
   if (loading) return <div className="loading">Đang tải…</div>
 
-  const item = timeline[index]
+  const isDemo = auth.accountMode === 'demo'
+  // Demo/chưa đăng nhập: dropdown chỉ liệt kê ĐÚNG 3 bài đầu tiên trong cả chuỗi
+  // (không hiện hết rồi khóa từng bài — gọn và rõ ràng hơn hẳn).
+  const visibleTimeline = isDemo ? timeline.slice(0, 3) : timeline
+
+  const item = visibleTimeline[index]
   const isPaidForThisLevel = item ? auth.isLevelUnlocked(item.levelId) : false
   const isPaidForThisModule = auth.isModuleUnlocked(moduleName)
-  const isDemo = auth.accountMode === 'demo'
-  // Demo: chỉ 3 bài đầu tiên trong CẢ CHUỖI được mở, không xét cờ is_demo_free của từng bài
-  // (cờ đó chỉ có ý nghĩa trong phạm vi 1 cấp ở chế độ "Học theo cấp", không áp dụng ở đây).
-  const locked = item
-    ? (isDemo ? index >= 3 : (!isPaidForThisLevel && !isPaidForThisModule && !item.lesson.is_demo_free))
+  const locked = item && !isDemo
+    ? (!isPaidForThisLevel && !isPaidForThisModule && !item.lesson.is_demo_free)
     : false
 
   return (
@@ -92,10 +94,10 @@ export default function ModuleExplorer({ auth }) {
         </div>
         <div className="select-field wide">
           <label>Bài học</label>
-          <select value={timeline.length ? index : ''} onChange={e => setIndex(Number(e.target.value))} disabled={timeline.length === 0}>
-            {timeline.length === 0
+          <select value={visibleTimeline.length ? index : ''} onChange={e => setIndex(Number(e.target.value))} disabled={visibleTimeline.length === 0}>
+            {visibleTimeline.length === 0
               ? <option>— chưa có bài —</option>
-              : timeline.map((it, i) => (
+              : visibleTimeline.map((it, i) => (
                 <option key={`${it.levelId}-${it.lesson.id}`} value={i}>
                   {it.levelName} · Bài {i + 1}: {it.lesson.title}
                 </option>
@@ -104,7 +106,7 @@ export default function ModuleExplorer({ auth }) {
         </div>
       </div>
 
-      {timeline.length === 0 ? (
+      {visibleTimeline.length === 0 ? (
         <div className="loading">Chưa có nội dung cho module này.</div>
       ) : (
         <>
@@ -117,8 +119,8 @@ export default function ModuleExplorer({ auth }) {
 
           <div className="lesson-nav">
             <button className="nav-btn" disabled={index === 0} onClick={() => setIndex(i => i - 1)}>← Trước</button>
-            <span className="progress">{index + 1} / {timeline.length}</span>
-            <button className="nav-btn" disabled={index === timeline.length - 1} onClick={() => setIndex(i => i + 1)}>Sau →</button>
+            <span className="progress">{index + 1} / {visibleTimeline.length}{isDemo ? ` (demo · tổng ${timeline.length} bài)` : ''}</span>
+            <button className="nav-btn" disabled={index === visibleTimeline.length - 1} onClick={() => setIndex(i => i + 1)}>Sau →</button>
           </div>
         </>
       )}
