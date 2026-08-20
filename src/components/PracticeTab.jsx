@@ -20,15 +20,15 @@ function renderScoreRow(measures, highlightGid) {
       const noteW = n.dur * beatW
       const cx = x + noteW / 2
       const isCurrent = n.gid === highlightGid
-      const col = isCurrent ? '#e8b64a' : '#0f2a52'
+      const col = isCurrent ? '#ffb627' : '#1b2b65'
       const filled = n.dur === 1
       els += `<g>`
       els += filled
         ? `<ellipse cx="${cx}" cy="${y}" rx="7" ry="5.5" fill="${col}"/>`
-        : `<ellipse cx="${cx}" cy="${y}" rx="7" ry="5.5" fill="${isCurrent ? '#fbf1d9' : 'none'}" stroke="${col}" stroke-width="1.8"/>`
+        : `<ellipse cx="${cx}" cy="${y}" rx="7" ry="5.5" fill="${isCurrent ? '#fff2d6' : 'none'}" stroke="${col}" stroke-width="1.8"/>`
       els += `<line x1="${cx + 6.5}" y1="${y}" x2="${cx + 6.5}" y2="${y - 30}" stroke="${col}" stroke-width="1.4"/>`
       if (n.note === 'C') els += `<line x1="${cx - 9}" y1="86" x2="${cx + 9}" y2="86" stroke="#1c2333" stroke-width="1"/>`
-      els += `<text x="${cx}" y="98" font-size="10" fill="${isCurrent ? '#93701f' : '#5c6270'}" text-anchor="middle" font-weight="${isCurrent ? '700' : '400'}">${SOLFEGE[n.note]}</text>`
+      els += `<text x="${cx}" y="98" font-size="10" fill="${isCurrent ? '#8a5a06' : '#6b7280'}" text-anchor="middle" font-weight="${isCurrent ? '700' : '400'}">${SOLFEGE[n.note]}</text>`
       els += `</g>`
       x += noteW
     })
@@ -37,7 +37,7 @@ function renderScoreRow(measures, highlightGid) {
   })
   const totalW = x + 10
   const staffLines = `<g stroke="#1c2333" stroke-width="1"><line x1="10" y1="15" x2="${totalW - 10}" y2="15"/><line x1="10" y1="30" x2="${totalW - 10}" y2="30"/><line x1="10" y1="45" x2="${totalW - 10}" y2="45"/><line x1="10" y1="60" x2="${totalW - 10}" y2="60"/><line x1="10" y1="75" x2="${totalW - 10}" y2="75"/></g>`
-  const clef = `<text x="14" y="58" font-size="42" fill="#0f2a52">&#119070;</text>`
+  const clef = `<text x="14" y="58" font-size="42" fill="#1b2b65">&#119070;</text>`
   return `<svg viewBox="0 0 ${totalW} 108" width="100%" style="display:block;margin-bottom:10px">${staffLines}${clef}${els}</svg>`
 }
 
@@ -53,7 +53,7 @@ export default function PracticeTab({ levelId, allLevels }) {
 
   useEffect(() => {
     setLoading(true)
-    const query = supabase.from('practice_scores').select('*, levels(name, order_index)').order('order_index')
+    const query = supabase.from('practice_scores').select('*, levels(name, order_index)').eq('kind', 'practice').order('order_index')
     const scoped = allLevels ? query : query.eq('level_id', levelId)
     scoped.then(({ data }) => {
       const sorted = (data || []).slice().sort((a, b) =>
