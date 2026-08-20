@@ -12,6 +12,7 @@ import TestTab from './components/TestTab.jsx'
 import PracticeTab from './components/PracticeTab.jsx'
 import ModuleExplorer from './components/ModuleExplorer.jsx'
 import ModuleReviewTab from './components/ModuleReviewTab.jsx'
+import SingingTab from './components/SingingTab.jsx'
 import { useAuth } from './hooks/useAuth.js'
 
 export default function App() {
@@ -105,6 +106,9 @@ export default function App() {
           <div style={{ display: tab === 'practice' ? 'block' : 'none' }}>
             <PracticeTab allLevels />
           </div>
+          <div style={{ display: tab === 'singing' ? 'block' : 'none' }}>
+            <SingingTab auth={auth} />
+          </div>
         </>
       ) : (
         <>
@@ -125,6 +129,9 @@ export default function App() {
           </div>
           <div style={{ display: tab === 'practice' ? 'block' : 'none' }}>
             <PracticeTab levelId={activeLevelId} />
+          </div>
+          <div style={{ display: tab === 'singing' ? 'block' : 'none' }}>
+            <SingingTab auth={auth} />
           </div>
         </>
       )}

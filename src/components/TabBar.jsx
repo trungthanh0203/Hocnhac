@@ -4,6 +4,7 @@ const TABS = [
   { key: 'test', label: 'Bài test' },
   { key: 'practice', label: 'Thực hành' },
   { key: 'ear', label: 'Luyện âm' },
+  { key: 'singing', label: 'Luyện hát' },
 ]
 
 export default function TabBar({ active, onChange }) {
