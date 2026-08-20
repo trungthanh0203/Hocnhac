@@ -66,7 +66,7 @@ export default function App() {
               </button>
             )}
             <button className="roadmap-btn" onClick={() => setAuthOpen(o => !o)}>
-              {auth.user ? 'Tài khoản' : 'Đăng nhập'}
+              {auth.user ? 'Tài khoản' : 'Đăng nhập'} <span style={{ fontSize: 9, marginLeft: 3 }}>{authOpen ? '▲' : '▼'}</span>
             </button>
           </div>
         </div>
