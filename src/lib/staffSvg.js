@@ -392,3 +392,33 @@ export function renderMediaFullV5(media) {
   if (media.kind === 'piano') return renderPianoSVG(media.highlight || [])
   return _prevRenderMediaFullV4(media)
 }
+
+// ============================================================
+// BO SUNG: bảng so sánh trực quan trường độ / dấu lặng (dạng thẻ liền nhau)
+// dùng cho các bài Ôn tập tổng kết — nhìn 1 hàng là so sánh được hết.
+// ============================================================
+function renderCompareCardsSVG(items, size = 340) {
+  const bw = 80, bh = 64
+  const totalW = items.length * bw
+  let els = ''
+  items.forEach(([name, val], i) => {
+    const x = i * bw
+    els += `<rect x="${x + 4}" y="4" width="${bw - 8}" height="${bh - 8}" rx="10" fill="#fff8ec" stroke="#1a1614" stroke-width="1"/>`
+    els += `<text x="${x + bw / 2}" y="30" font-size="12" fill="#1a1614" text-anchor="middle" font-weight="700">${name}</text>`
+    els += `<text x="${x + bw / 2}" y="48" font-size="13" fill="#e8a933" text-anchor="middle" font-weight="800">${val}</text>`
+  })
+  return `<svg viewBox="0 0 ${totalW} ${bh}" width="${size}" style="display:block;margin:0 auto">${els}</svg>`
+}
+
+const DURATION_BASIC = [['Tròn', '4p'], ['Trắng', '2p'], ['Đen', '1p'], ['Móc đơn', '½p']]
+const DURATION_FULL = [...DURATION_BASIC, ['Móc kép', '¼p'], ['Móc ba', '⅛p'], ['Móc bốn', '1/16p']]
+const REST_BASIC = [['Lặng tròn', '4p'], ['Lặng trắng', '2p'], ['Lặng đen', '1p']]
+const REST_FULL = [...REST_BASIC, ['Lặng móc đơn', '½p']]
+
+const _prevRenderMediaFullV5 = renderMediaFullV5
+export function renderMediaFullV6(media) {
+  if (!media) return ''
+  if (media.kind === 'duration_compare') return renderCompareCardsSVG(media.extended ? DURATION_FULL : DURATION_BASIC)
+  if (media.kind === 'rest_compare_full') return renderCompareCardsSVG(media.extended ? REST_FULL : REST_BASIC)
+  return _prevRenderMediaFullV5(media)
+}

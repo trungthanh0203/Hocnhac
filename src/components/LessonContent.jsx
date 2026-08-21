@@ -1,4 +1,4 @@
-import { renderMediaFullV5 as renderMediaFull } from '../lib/staffSvg.js'
+import { renderMediaFullV6 as renderMediaFull } from '../lib/staffSvg.js'
 import { playAudioAction } from '../lib/audio.js'
 
 // Phần hiển thị NỘI DUNG của 1 bài học — dùng chung cho cả tab "Bài học" (theo cấp)
